@@ -5,36 +5,36 @@ services:
     container_name: voicepocket_apiserver
     build:
       context: ./voicepocket
-    # environment:
-    #   SPRING_DATASOURCE_URL: 
-    #   SPRING_DATASOURCE_USERNAME: 
-    #   SPRING_DATASOURCE_PASSWORD: 
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://voicepocket_mysql:3306/voice_pocket
+      SPRING_DATASOURCE_USERNAME: voice_docker
+      SPRING_DATASOURCE_PASSWORD: voice!
     restart: on-failure
     ports:
       - 8080:8080
     networks:
       - voicePocket
-    # depends_on:
-    #   - voicepocket_mysql
+    depends_on:
+      - voicepocket_mysql
 
-  # voicepocket_mysql:
-  #   image: mysql
-  #   command:
-  #     - --character-set-server=utf8mb4
-  #     - --collation-server=utf8mb4_general_ci
-  #   container_name: voicepocket_mysql
-  #   ports:
-  #     - "3306:3306"
-  #   volumes:
-  #     - ./config/my.cnf:/etc/mysql/conf.d/my.cnf
-  #   environment: #
-  #     - MYSQL_ROOT_PASSWORD=1234
-  #     - MYSQL_DATABASE=voice_pocket
-  #     - MYSQL_USER=voice_docker
-  #     - MYSQL_PASSWORD=voice!
-  #     - TZ=Asia/Seoul
-  #   networks:
-  #     - voicePocket
+  voicepocket_mysql:
+    image: mysql
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_general_ci
+    container_name: voicepocket_mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./celery_consumer/config/my.cnf:/etc/mysql/conf.d/my.cnf
+    environment: #
+      - MYSQL_ROOT_PASSWORD=1234
+      - MYSQL_DATABASE=voice_pocket
+      - MYSQL_USER=voice_docker
+      - MYSQL_PASSWORD=voice!
+      - TZ=Asia/Seoul
+    networks:
+      - voicePocket
 
   rabbit:
       container_name: voicepocket_rabbitmq
