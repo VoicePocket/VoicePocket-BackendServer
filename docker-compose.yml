@@ -67,6 +67,22 @@ services:
     volumes:
       - ./celery_consumer:/voice_pocket
 
+  redis:
+    image: redis:latest
+    container_name: voicepocket_redis
+    ports:
+      - 6379:6379
+    # volumes:
+    #   - ./redis/data:/data
+    #   - ./redis/conf/redis.conf:/usr/local/conf/redis.conf
+    labels:
+      - "name=voicepocket_redis"
+      - "mode=standalone"
+    networks:
+      - voicePocket
+    # restart: always
+    command: redis-server # /usr/local/conf/redis.conf
+
 networks:
   voicePocket:
     driver: bridge
