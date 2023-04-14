@@ -1,14 +1,17 @@
 import os, sys, tarfile, pickle
-# sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
 from TTS.utils.synthesizer import Synthesizer
 from text_process import normalize_text
 from bucket_process import down_model_from_bucket, upload_wav_to_bucket
 
+import redis
+
+# 레디스 연결
+rd = redis.Redis(host='voicepocket_redis', port=6379, db=0)
+
+
 def is_set(email):
-    if synth_dict.get(email) == None:
-        return False
-    return True
+    return rd.get(email) != None
 
 def add_synth(email):
     # TODO: best 모델 구성이 결정되면 그에 맞춰 코드를 수정할 것!
@@ -27,16 +30,15 @@ def add_synth(email):
         vocoder_config="./voice_model_new/HiFi_GAN_config.json"
     )
 
-    synth_dict[email] = synthesizer
+    serialized_syn = pickle.dumps(synthesizer)
+    rd.set(email, serialized_syn)
     
-    with open("./synthesizer.pickle","wb") as fw:
-        pickle.dump(synth_dict, fw)
-    
-    # os.remove(voice_model_path)
-
 def make_tts(email, uuid, text):
     wav_path = f'./wav/{uuid}.wav'
-    syn = synth_dict.get(email)
+    
+    serialized_syn = rd.get(email)
+    syn = pickle.loads(serialized_syn)
+
     symbol = syn.tts_config.characters.characters
     text = normalize_text(text, symbol)
     wav = syn.tts(text, None, None)
@@ -45,8 +47,3 @@ def make_tts(email, uuid, text):
     upload_wav_to_bucket(wav_path, email, uuid)
     
     os.remove(wav_path)
-
-synth_dict = {}
-
-with open("./synthesizer.pickle","rb") as fr:
-    synth_dict = pickle.load(fr)

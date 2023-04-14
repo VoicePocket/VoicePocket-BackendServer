@@ -5,6 +5,5 @@ voice_model_new/*.json
 voice_model_new/*.npy
 wav/*.wav
 voicepocket-bucketKey.json
-synthesizer.pickle
 .DS_Store
 .erlang.cookie
