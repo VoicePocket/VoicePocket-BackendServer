@@ -24,10 +24,8 @@ def add_synth(email):
     #     best_model_tar.extractall(f"./api_server/voice_model")
 
     synthesizer = Synthesizer(
-        tts_checkpoint="./voice_model_new/Glow_TTS_best_model.pth",
-        tts_config_path="./voice_model_new/Glow_TTS_config.json",
-        vocoder_checkpoint="./voice_model_new/HiFi_GAN_best_model.pth",
-        vocoder_config="./voice_model_new/HiFi_GAN_config.json"
+        tts_checkpoint = "./voice_model_new/best_model.pth",
+        tts_config_path = "./voice_model_new/config.json"
     )
 
     serialized_syn = pickle.dumps(synthesizer)
