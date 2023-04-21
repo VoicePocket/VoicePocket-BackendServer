@@ -1,5 +1,7 @@
 package com.vp.voicepocket.domain.message.controller;
 
+import com.vp.voicepocket.domain.message.dto.TaskIdResponseDto;
+import com.vp.voicepocket.domain.message.dto.TaskInfoResponseDto;
 import com.vp.voicepocket.domain.message.exception.CTaskNotFinishedException;
 import com.vp.voicepocket.domain.message.exception.CTaskNotFoundException;
 import com.vp.voicepocket.domain.message.model.Message;
@@ -12,6 +14,7 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -45,11 +48,8 @@ public class MessageController {
             in = ParameterIn.HEADER)
     @Operation(summary = "TTS Task id 체크", description = "uuid로 TTS task id를 얻어옵니다.")
     @GetMapping("/tts/status/uuid/{uuid}")
-    public SingleResult<String> getTaskId(@PathVariable String uuid) {
-        String taskId = messageService.getTaskId(uuid);
-        if (taskId == null) throw new CTaskNotFoundException();
-
-        return responseService.getSingleResult(taskId);
+    public SingleResult<TaskIdResponseDto> getTaskId(@PathVariable String uuid) {
+        return responseService.getSingleResult(messageService.getTaskId(uuid));
     }
 
     @Parameter(
@@ -60,10 +60,7 @@ public class MessageController {
             in = ParameterIn.HEADER)
     @Operation(summary = "TTS Task 체크", description = "task id로 TTS 작업의 진행상태를 봅니다.")
     @GetMapping("/tts/status/taskId/{taskId}")
-    public SingleResult<String> getTaskStatus(@PathVariable String taskId) {
-        String status = messageService.getTaskStatus(taskId);
-        if (status == null) throw new CTaskNotFinishedException();
-
-        return responseService.getSingleResult(status);
+    public SingleResult<TaskInfoResponseDto> getTaskStatus(@PathVariable String taskId) {
+        return responseService.getSingleResult(messageService.getTaskStatus(taskId));
     }
 }

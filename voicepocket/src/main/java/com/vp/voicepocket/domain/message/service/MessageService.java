@@ -1,6 +1,11 @@
 package com.vp.voicepocket.domain.message.service;
 
+import com.vp.voicepocket.domain.message.dto.TaskIdResponseDto;
+import com.vp.voicepocket.domain.message.dto.TaskInfoResponseDto;
+import com.vp.voicepocket.domain.message.exception.CTaskNotFinishedException;
+import com.vp.voicepocket.domain.message.exception.CTaskNotFoundException;
 import com.vp.voicepocket.domain.message.model.Message;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -20,19 +25,25 @@ public class MessageService {
         rabbitTemplate.convertAndSend("default", "input.key", message);
     }
 
-    public String getTaskStatus(String taskId) {
-        String value = stringRedisTemplate.opsForValue().get("celery-task-meta-" + taskId);
-        if (value == null) return null;
-
-        JSONObject json = new JSONObject(value);
-        return json.optString("result");
-    }
-
-    public String getTaskId(String uuid) {
+    public TaskIdResponseDto getTaskId(String uuid) {
         String taskId = stringRedisTemplate.opsForValue().get(uuid);
-        if (taskId == null) return null;
+        if (taskId == null) throw new CTaskNotFoundException();
 
         JSONObject json = new JSONObject(taskId);
-        return json.optString("task_id");
+        return TaskIdResponseDto.builder()
+                .taskId(json.optString("task_id"))
+                .build();
+    }
+
+    public TaskInfoResponseDto getTaskStatus(String taskId) {
+        String value = stringRedisTemplate.opsForValue().get("celery-task-meta-" + taskId);
+        if (value == null) throw new CTaskNotFinishedException();
+
+        JSONObject json = new JSONObject(value);
+        return TaskInfoResponseDto.builder()
+                .taskId(json.optString("task_id"))
+                .status(json.optString("status"))
+                .result(json.optString("result"))
+                .build();
     }
 }
