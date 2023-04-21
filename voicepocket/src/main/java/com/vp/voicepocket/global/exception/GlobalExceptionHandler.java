@@ -1,5 +1,7 @@
 package com.vp.voicepocket.global.exception;
 
+import com.vp.voicepocket.domain.message.exception.CTaskNotFinishedException;
+import com.vp.voicepocket.domain.message.exception.CTaskNotFoundException;
 import com.vp.voicepocket.domain.token.exception.*;
 import com.vp.voicepocket.domain.user.exception.CEmailLoginFailedException;
 import com.vp.voicepocket.domain.user.exception.CEmailSignUpFailedException;
@@ -132,5 +134,29 @@ public class GlobalExceptionHandler {
         return responseService.getFailResult(
                 Integer.parseInt(getMessage("accessTokenInValid.code")), getMessage("accessTokenInValid.msg")
         );
+    }
+
+    /***
+     * -1008
+     * TTS Task Id를 찾지 못했을 때 발생시키는 예외
+     */
+    @ExceptionHandler(CTaskNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected CommonResult taskNotFoundException(
+            HttpServletRequest request, CTaskNotFoundException e) {
+        return responseService.getFailResult(
+                Integer.parseInt(getMessage("taskNotFound.code")), getMessage("taskNotFound.msg"));
+    }
+
+    /***
+     * -1009
+     * TTS Task가 아직 실행 중일 때 발생시키는 예외
+     */
+    @ExceptionHandler(CTaskNotFinishedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected CommonResult taskNotFinishedException(
+            HttpServletRequest request, CTaskNotFinishedException e) {
+        return responseService.getFailResult(
+                Integer.parseInt(getMessage("taskNotFinished.code")), getMessage("taskNotFinished.msg"));
     }
 }
