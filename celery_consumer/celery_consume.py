@@ -1,8 +1,10 @@
-import json, time
+import redis, json
 
 from celery import Celery
 from celery import bootsteps
 from kombu import Consumer, Exchange, Queue
+
+rd = redis.Redis(host='voicepocket_redis', port=6379, db=0)
 
 queue = Queue("input.queue", Exchange("default"), "input.key")
 
@@ -48,6 +50,8 @@ class ETLMessageHandler(object):
         _email = body["email"]
         _text = body["text"]
         task = text_to_speech.delay(_uuid, _email, _text)
+        _task_json = json.dumps({"task_id":task.id})
+        rd.set(_uuid, _task_json)
 
 
 # Declaring the bootstep for our purposes
