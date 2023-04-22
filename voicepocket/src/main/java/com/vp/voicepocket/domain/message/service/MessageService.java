@@ -31,6 +31,7 @@ public class MessageService {
 
         JSONObject json = new JSONObject(taskId);
         return TaskIdResponseDto.builder()
+                .uuid(uuid)
                 .taskId(json.optString("task_id"))
                 .build();
     }
