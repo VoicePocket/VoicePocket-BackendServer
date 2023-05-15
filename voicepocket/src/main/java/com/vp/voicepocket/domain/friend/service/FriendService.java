@@ -11,7 +11,6 @@ import com.vp.voicepocket.domain.user.entity.User;
 import com.vp.voicepocket.domain.user.exception.CUserNotFoundException;
 import com.vp.voicepocket.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,10 +29,8 @@ public class FriendService {
         Authentication authentication= getAuthByAccessToken(accessToken);
         User to_user = userRepository.findByEmail(friendRequestDto.getEmail()).orElseThrow(CUserNotFoundException::new);
         User from_user = userRepository.findById(Long.parseLong(authentication.getName())).orElseThrow(CUserNotFoundException::new);
-        /*
-        if(friendRepository.findByRequest(from_user).isPresent())
+        if(friendRepository.findByRequest(from_user, to_user).isPresent())
             throw new CFriendNotFoundException();
-        */
         Friend friend = friendRequestDto.toEntity(from_user, to_user);
         return mapFriendEntityToFriendResponseDTO(friendRepository.save(friend));
     }
@@ -51,8 +48,8 @@ public class FriendService {
     private FriendResponseDto mapFriendEntityToFriendResponseDTO(Friend friend){
         return FriendResponseDto.builder()
                 .id(friend.getId())
-                .request_from(friend.getRequest_from().getUserId())
-                .request_to(friend.getRequest_to().getUserId())
+                .request_from(friend.getRequest_from())
+                .request_to(friend.getRequest_to())
                 .status(friend.getStatus())
                 .createdDate(friend.getCreatedDate())
                 .modifiedDate(friend.getModifiedDate())

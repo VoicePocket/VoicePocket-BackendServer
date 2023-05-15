@@ -1,6 +1,7 @@
 package com.vp.voicepocket.domain.friend.dto.response;
 
 
+import com.vp.voicepocket.domain.user.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -10,10 +11,10 @@ import java.time.LocalDateTime;
 @Builder
 public class FriendResponseDto {
     private final Long id;
-    private final Long request_from;
-    private final Long request_to;
+    private final User request_from;
+    private final User request_to;
     private final Long status;
-    private final LocalDateTime modifiedDate;
     private final LocalDateTime createdDate;
+    private final LocalDateTime modifiedDate;
 
 }

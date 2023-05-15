@@ -22,12 +22,9 @@ import org.springframework.web.bind.annotation.*;
 public class FriendController {
 
     private final FriendService friendService;
+
     private final ResponseService responseService;
-    //TODO:
-    // 0. Email 기반 User 유무 파악
-    // 1. Email 기반 친구 요청
-    // 2. 이미 친구인지의 여부 and 요청을 보낸 상태인지 확인 필요
-    // 3. 위 조건 다 맞으면 Friends Table 에 insert (from: 요청 보낸 유저, to: 요청 받을 유저, status:1L)
+
     @Parameter(
             name = "X-AUTH-TOKEN",
             description = "로그인 성공 후 AccessToken",
