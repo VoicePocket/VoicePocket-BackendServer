@@ -1,6 +1,7 @@
 package com.vp.voicepocket.global.exception;
 
 import com.vp.voicepocket.domain.friend.exception.CFriendNotFoundException;
+import com.vp.voicepocket.domain.friend.exception.CFriendRequestNotExistException;
 import com.vp.voicepocket.domain.message.exception.CTaskNotFinishedException;
 import com.vp.voicepocket.domain.message.exception.CTaskNotFoundException;
 import com.vp.voicepocket.domain.token.exception.*;
@@ -171,5 +172,17 @@ public class GlobalExceptionHandler {
             HttpServletRequest request, CFriendNotFoundException e) {
         return responseService.getFailResult(
                 Integer.parseInt(getMessage("friendNotFound.code")), getMessage("friendNotFound.msg"));
+    }
+
+    /***
+     * -1011
+     * 친구 추가 요청이 존재하지 않는 경우.
+     */
+    @ExceptionHandler(CFriendRequestNotExistException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected CommonResult friendRequestNotExistException(
+            HttpServletRequest request, CFriendRequestNotExistException e) {
+        return responseService.getFailResult(
+                Integer.parseInt(getMessage("friendRequestNotExist.code")), getMessage("friendRequestNotExist.msg"));
     }
 }

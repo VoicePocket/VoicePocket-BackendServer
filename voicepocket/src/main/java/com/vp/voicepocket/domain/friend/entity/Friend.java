@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Builder
 @Getter
@@ -40,11 +41,8 @@ public class Friend extends BaseEntity{
     @Column(name = "modifiedDate")
     private LocalDateTime modifiedDate;
 
-    public void conformed_friend(){
-        this.status = 2L;
-    }
-
-    public void reject_friend(){
-        this.status = 3L;
+    public void updateStatus(Long status){
+        this.status = status;
+        this.modifiedDate = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
     }
 }

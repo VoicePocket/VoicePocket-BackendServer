@@ -4,6 +4,7 @@ import com.vp.voicepocket.domain.friend.dto.request.FriendRequestDto;
 import com.vp.voicepocket.domain.friend.dto.response.FriendResponseDto;
 import com.vp.voicepocket.domain.friend.entity.Friend;
 import com.vp.voicepocket.domain.friend.exception.CFriendNotFoundException;
+import com.vp.voicepocket.domain.friend.exception.CFriendRequestNotExistException;
 import com.vp.voicepocket.domain.friend.repository.FriendRepository;
 import com.vp.voicepocket.domain.token.config.JwtProvider;
 import com.vp.voicepocket.domain.token.exception.CAccessTokenException;
@@ -14,6 +15,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -54,5 +58,26 @@ public class FriendService {
                 .createdDate(friend.getCreatedDate())
                 .modifiedDate(friend.getModifiedDate())
                 .build();
+    }
+
+    // TODO: FIX
+    @Transactional
+    public List<FriendResponseDto> checkRequest(String accessToken) {
+        Authentication authentication= getAuthByAccessToken(accessToken);
+        User to_user = userRepository.findById(Long.parseLong(authentication.getName())).orElseThrow(CUserNotFoundException::new);
+        return friendRepository.findByToUser(to_user).orElseThrow(CFriendRequestNotExistException::new)
+                .stream()
+                .map(FriendResponseDto::new)
+                .collect(Collectors.toList());
+    }
+
+
+    @Transactional
+    public void update(FriendRequestDto friendRequestDto, String accessToken, Long status){
+        Authentication authentication= getAuthByAccessToken(accessToken);
+        User from_user = userRepository.findByEmail(friendRequestDto.getEmail()).orElseThrow(CUserNotFoundException::new);
+        User to_user = userRepository.findById(Long.parseLong(authentication.getName())).orElseThrow(CUserNotFoundException::new);
+        Friend modifiedFriend = friendRepository.findByRequestAccept(from_user, to_user).orElseThrow(CFriendRequestNotExistException::new);
+        modifiedFriend.updateStatus(status);
     }
 }

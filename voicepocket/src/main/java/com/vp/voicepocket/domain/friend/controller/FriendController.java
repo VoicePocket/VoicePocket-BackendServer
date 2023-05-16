@@ -3,6 +3,8 @@ package com.vp.voicepocket.domain.friend.controller;
 import com.vp.voicepocket.domain.friend.dto.request.FriendRequestDto;
 import com.vp.voicepocket.domain.friend.dto.response.FriendResponseDto;
 import com.vp.voicepocket.domain.friend.service.FriendService;
+import com.vp.voicepocket.global.common.response.model.CommonResult;
+import com.vp.voicepocket.global.common.response.model.ListResult;
 import com.vp.voicepocket.global.common.response.model.SingleResult;
 import com.vp.voicepocket.global.common.response.service.ResponseService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,5 +43,49 @@ public class FriendController {
         return responseService.getSingleResult(friendResponseDto);
     }
 
+    @Parameter(
+            name = "X-AUTH-TOKEN",
+            description = "로그인 성공 후 AccessToken",
+            required = true,
+            schema = @Schema(type = "string"),
+            in = ParameterIn.HEADER)
+    @Operation(summary = "친구 요청 리스트 확인", description = "친구 요청을 확인합니다.")
+    @PostMapping("/friend/check")
+    public ListResult<FriendResponseDto> checkRequest(@RequestHeader("X-AUTH-TOKEN") String accessToken) {
+        return responseService.getListResult(friendService.checkRequest(accessToken));
+    }
+
+    @Parameter(
+            name = "X-AUTH-TOKEN",
+            description = "로그인 성공 후 AccessToken",
+            required = true,
+            schema = @Schema(type = "string"),
+            in = ParameterIn.HEADER)
+    @Operation(summary = "친구 요청 수락", description = "친구 요청을 수락합니다.")
+    @PostMapping("/friend/accept")
+    public CommonResult acceptRequest(
+            @RequestHeader("X-AUTH-TOKEN") String accessToken,
+            @Parameter(description = "친구 요청 DTO", required = true)
+            @RequestBody FriendRequestDto friendRequestDto) {
+        friendService.update(friendRequestDto,accessToken, 2L);
+        return responseService.getSuccessResult();
+    }
+
+
+    @Parameter(
+            name = "X-AUTH-TOKEN",
+            description = "로그인 성공 후 AccessToken",
+            required = true,
+            schema = @Schema(type = "string"),
+            in = ParameterIn.HEADER)
+    @Operation(summary = "친구 요청 거절", description = "친구 요청을 거절합니다.")
+    @PostMapping("/friend/reject")
+    public CommonResult rejectRequest(
+            @RequestHeader("X-AUTH-TOKEN") String accessToken,
+            @Parameter(description = "친구 요청 DTO", required = true)
+            @RequestBody FriendRequestDto friendRequestDto) {
+        friendService.update(friendRequestDto,accessToken, 3L);
+        return responseService.getSuccessResult();
+    }
 
 }

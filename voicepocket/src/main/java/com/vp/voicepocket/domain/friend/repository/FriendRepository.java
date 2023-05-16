@@ -7,9 +7,16 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 @Repository
 public interface FriendRepository extends JpaRepository<Friend, Long> {
     @Query(value = "select f from Friend f where f.request_from = :request_from and f.request_to = :request_to and f.status in (1,2)")
     Optional<Friend> findByRequest(@Param("request_from") User request_from, @Param("request_to")User request_to);
+
+    @Query(value = "select f from Friend f where f.request_from = :request_from and f.request_to = :request_to and f.status = 1")
+    Optional<Friend> findByRequestAccept(@Param("request_from") User request_from, @Param("request_to")User request_to);
+
+    @Query(value = "select f from Friend f where f.request_to = :request_to and f.status = 1")
+    Optional<List<Friend>> findByToUser(@Param("request_to") User request_to);
 }
