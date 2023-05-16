@@ -64,8 +64,6 @@ public class FriendService {
                 .request_from(friend.getRequest_from())
                 .request_to(friend.getRequest_to())
                 .status(friend.getStatus())
-                .createdDate(friend.getCreatedDate())
-                .modifiedDate(friend.getModifiedDate())
                 .build();
     }
 
@@ -74,9 +72,9 @@ public class FriendService {
     public List<FriendResponseDto> checkRequest(String accessToken) {
         Authentication authentication= getAuthByAccessToken(accessToken);
         User to_user = userRepository.findById(Long.parseLong(authentication.getName())).orElseThrow(CUserNotFoundException::new);
-        return friendRepository.findByToUser(to_user).orElseThrow(CFriendRequestNotExistException::new)
+        return friendRepository.findByToUser(to_user)   // 없을 때 공백 리스트를 반환하기
                 .stream()
-                .map(FriendResponseDto::new)
+                .map(this::mapFriendEntityToFriendResponseDTO)
                 .collect(Collectors.toList());
     }
 

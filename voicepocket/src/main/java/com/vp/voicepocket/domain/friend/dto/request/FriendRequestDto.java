@@ -16,6 +16,6 @@ public class FriendRequestDto {
     private String email;
 
     public Friend toEntity(User request_from, User request_to) {
-        return Friend.builder().request_from(request_from).request_to(request_to).status(1L).createdDate(LocalDateTime.now(ZoneId.of("Asia/Seoul"))).build();
+        return Friend.builder().request_from(request_from).request_to(request_to).status(1L).build();
     }
 }

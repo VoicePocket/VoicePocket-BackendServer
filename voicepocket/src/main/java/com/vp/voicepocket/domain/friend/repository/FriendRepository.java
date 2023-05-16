@@ -20,5 +20,5 @@ public interface FriendRepository extends JpaRepository<Friend, Long> {
     Optional<Friend> findByRequestAccept(@Param("request_from") User request_from, @Param("request_to")User request_to);
 
     @Query(value = "select f from Friend f where f.request_to = :request_to and f.status = 1")
-    Optional<List<Friend>> findByToUser(@Param("request_to") User request_to);
+    List<Friend> findByToUser(@Param("request_to") User request_to);
 }
