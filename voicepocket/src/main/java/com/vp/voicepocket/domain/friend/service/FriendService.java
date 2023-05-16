@@ -31,10 +31,19 @@ public class FriendService {
     @Transactional
     public FriendResponseDto requestFriend(FriendRequestDto friendRequestDto, String accessToken) {
         Authentication authentication= getAuthByAccessToken(accessToken);
-        User to_user = userRepository.findByEmail(friendRequestDto.getEmail()).orElseThrow(CUserNotFoundException::new);
-        User from_user = userRepository.findById(Long.parseLong(authentication.getName())).orElseThrow(CUserNotFoundException::new);
-        if(friendRepository.findByRequest(from_user, to_user).isPresent())
-            throw new CFriendNotFoundException();
+
+        User to_user =
+                userRepository.findByEmail(friendRequestDto.getEmail())
+                        .orElseThrow(CUserNotFoundException::new);
+
+        User from_user =
+                userRepository.findById(Long.parseLong(authentication.getName()))
+                        .orElseThrow(CUserNotFoundException::new);
+
+        if (friendRepository.findByRequest(from_user, to_user).isPresent()) {
+            throw new CFriendNotFoundException();   // TODO: change to CFriendRequestOnGoingException
+        }
+
         Friend friend = friendRequestDto.toEntity(from_user, to_user);
         return mapFriendEntityToFriendResponseDTO(friendRepository.save(friend));
     }

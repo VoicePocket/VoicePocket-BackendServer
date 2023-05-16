@@ -50,11 +50,12 @@ public class FriendController {
             schema = @Schema(type = "string"),
             in = ParameterIn.HEADER)
     @Operation(summary = "친구 요청 리스트 확인", description = "친구 요청을 확인합니다.")
-    @PostMapping("/friend/check")
+    @PostMapping("/friend/check")   // TODO: GET Mapping 으로 바꾸기
     public ListResult<FriendResponseDto> checkRequest(@RequestHeader("X-AUTH-TOKEN") String accessToken) {
         return responseService.getListResult(friendService.checkRequest(accessToken));
     }
 
+    // TODO: 어차피 요청에 대한 수락 및 거절을 하는 것이니 하나로 묶어서 PUT Mapping 으로 받는 게 좋을 것 같다.
     @Parameter(
             name = "X-AUTH-TOKEN",
             description = "로그인 성공 후 AccessToken",
@@ -63,7 +64,7 @@ public class FriendController {
             in = ParameterIn.HEADER)
     @Operation(summary = "친구 요청 수락", description = "친구 요청을 수락합니다.")
     @PostMapping("/friend/accept")
-    public CommonResult acceptRequest(
+    public CommonResult acceptRequest(  // TODO: PUT Mapping 으로 뱌꾸기
             @RequestHeader("X-AUTH-TOKEN") String accessToken,
             @Parameter(description = "친구 요청 DTO", required = true)
             @RequestBody FriendRequestDto friendRequestDto) {
@@ -80,7 +81,7 @@ public class FriendController {
             in = ParameterIn.HEADER)
     @Operation(summary = "친구 요청 거절", description = "친구 요청을 거절합니다.")
     @PostMapping("/friend/reject")
-    public CommonResult rejectRequest(
+    public CommonResult rejectRequest(  // TODO: PUT Mapping 으로 뱌꾸기
             @RequestHeader("X-AUTH-TOKEN") String accessToken,
             @Parameter(description = "친구 요청 DTO", required = true)
             @RequestBody FriendRequestDto friendRequestDto) {
