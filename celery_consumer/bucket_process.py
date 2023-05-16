@@ -2,7 +2,7 @@ import os
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="./voicepocket-bucketKey.json"
 
 from google.cloud import storage
-
+BUCKET_NAME = 'voicepocket'
 """
 bucket_name: 서비스 계정 생성한 bucket 이름 입력
 
@@ -17,7 +17,7 @@ destination_blob_name = 업로드할 파일을 GCP에 저장할 때의 이름
 def down_model_from_bucket(email):
     storage_client = storage.Client()
 
-    bucket_name = 'voice_pocket'
+    bucket_name = BUCKET_NAME
     source_blob_name = f'{email}_best_model.pth.tar'
     destination_file_name = f'./voice_model/{source_blob_name}'
 
@@ -29,7 +29,7 @@ def down_model_from_bucket(email):
 def upload_wav_to_bucket(wav_path, email, uuid):
     storage_client = storage.Client()
     
-    bucket_name = 'voice_pocket'
+    bucket_name = BUCKET_NAME
     source_file_name = wav_path
     destination_blob_name = f'{email}/{uuid}.wav'
     

@@ -23,10 +23,16 @@ def add_synth(email):
     #     best_model_tar = tarfile.open(voice_model_path)
     #     best_model_tar.extractall(f"./api_server/voice_model")
 
-    synthesizer = Synthesizer(
-        tts_checkpoint = "./voice_model_new/best_model.pth",
-        tts_config_path = "./voice_model_new/config.json"
-    )
+    if email == "ssh@gmail.com":
+        synthesizer = Synthesizer(
+            tts_checkpoint = "./voice_model_new/ssh_checkpoint_84000.pth",
+            tts_config_path = "./voice_model_new/ssh_config.json"
+        )
+    else:
+        synthesizer = Synthesizer(
+            tts_checkpoint = "./voice_model_new/best_model.pth",
+            tts_config_path = "./voice_model_new/config.json"
+        )
 
     serialized_syn = pickle.dumps(synthesizer)
     rd.set(email, serialized_syn)

@@ -1,4 +1,6 @@
+dump.rdb
 application-local.yml
+application-docker.yml
 application-private.yml
 
 ###
