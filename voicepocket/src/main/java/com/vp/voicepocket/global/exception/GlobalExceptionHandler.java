@@ -1,7 +1,7 @@
 package com.vp.voicepocket.global.exception;
 
-import com.vp.voicepocket.domain.friend.exception.CFriendNotFoundException;
 import com.vp.voicepocket.domain.friend.exception.CFriendRequestNotExistException;
+import com.vp.voicepocket.domain.friend.exception.CFriendRequestOnGoingException;
 import com.vp.voicepocket.domain.message.exception.CTaskNotFinishedException;
 import com.vp.voicepocket.domain.message.exception.CTaskNotFoundException;
 import com.vp.voicepocket.domain.token.exception.*;
@@ -162,20 +162,10 @@ public class GlobalExceptionHandler {
         return responseService.getFailResult(
                 Integer.parseInt(getMessage("taskNotFinished.code")), getMessage("taskNotFinished.msg"));
     }
-    /***
-     * -1010
-     * Friend Table에 Status가 1L이거나 2L인 상태로 존재하는 경우.
-     */
-    @ExceptionHandler(CFriendNotFoundException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected CommonResult friendNotFoundException(
-            HttpServletRequest request, CFriendNotFoundException e) {
-        return responseService.getFailResult(
-                Integer.parseInt(getMessage("friendNotFound.code")), getMessage("friendNotFound.msg"));
-    }
+
 
     /***
-     * -1011
+     * -1010
      * 친구 추가 요청이 존재하지 않는 경우.
      */
     @ExceptionHandler(CFriendRequestNotExistException.class)
@@ -184,5 +174,17 @@ public class GlobalExceptionHandler {
             HttpServletRequest request, CFriendRequestNotExistException e) {
         return responseService.getFailResult(
                 Integer.parseInt(getMessage("friendRequestNotExist.code")), getMessage("friendRequestNotExist.msg"));
+    }
+
+    /***
+     * -1011
+     * 친구 추가 요청이 진행중인 경우
+     */
+    @ExceptionHandler(CFriendRequestOnGoingException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected CommonResult friendRequestOnGoingException(
+            HttpServletRequest request, CFriendRequestOnGoingException e){
+        return responseService.getFailResult(
+                Integer.parseInt(getMessage("friendRequestOnGoing.code")), getMessage("friendRequestOnGoing.msg"));
     }
 }

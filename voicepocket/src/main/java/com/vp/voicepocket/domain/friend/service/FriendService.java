@@ -3,8 +3,9 @@ package com.vp.voicepocket.domain.friend.service;
 import com.vp.voicepocket.domain.friend.dto.request.FriendRequestDto;
 import com.vp.voicepocket.domain.friend.dto.response.FriendResponseDto;
 import com.vp.voicepocket.domain.friend.entity.Friend;
-import com.vp.voicepocket.domain.friend.exception.CFriendNotFoundException;
+import com.vp.voicepocket.domain.friend.entity.Status;
 import com.vp.voicepocket.domain.friend.exception.CFriendRequestNotExistException;
+import com.vp.voicepocket.domain.friend.exception.CFriendRequestOnGoingException;
 import com.vp.voicepocket.domain.friend.repository.FriendRepository;
 import com.vp.voicepocket.domain.token.config.JwtProvider;
 import com.vp.voicepocket.domain.token.exception.CAccessTokenException;
@@ -40,11 +41,12 @@ public class FriendService {
                 userRepository.findById(Long.parseLong(authentication.getName()))
                         .orElseThrow(CUserNotFoundException::new);
 
-        if (friendRepository.findByRequest(from_user, to_user).isPresent()) {
-            throw new CFriendNotFoundException();   // TODO: change to CFriendRequestOnGoingException
+        if (friendRepository.findByRequest(from_user, to_user, Status.ONGOING).isPresent() ||
+                friendRepository.findByRequest(from_user, to_user, Status.ACCEPT).isPresent()) {
+            throw new CFriendRequestOnGoingException();
         }
 
-        Friend friend = friendRequestDto.toEntity(from_user, to_user);
+        Friend friend = friendRequestDto.toEntity(from_user, to_user, Status.ONGOING);
         return mapFriendEntityToFriendResponseDTO(friendRepository.save(friend));
     }
 
@@ -67,7 +69,7 @@ public class FriendService {
                 .build();
     }
 
-    // TODO: FIX
+    // TODO: Should Check Proxy Problem?
     @Transactional
     public List<FriendResponseDto> checkRequest(String accessToken) {
         Authentication authentication= getAuthByAccessToken(accessToken);
@@ -80,11 +82,11 @@ public class FriendService {
 
 
     @Transactional
-    public void update(FriendRequestDto friendRequestDto, String accessToken, Long status){
+    public void update(FriendRequestDto friendRequestDto, String accessToken, Status status){
         Authentication authentication= getAuthByAccessToken(accessToken);
         User from_user = userRepository.findByEmail(friendRequestDto.getEmail()).orElseThrow(CUserNotFoundException::new);
         User to_user = userRepository.findById(Long.parseLong(authentication.getName())).orElseThrow(CUserNotFoundException::new);
-        Friend modifiedFriend = friendRepository.findByRequestAccept(from_user, to_user).orElseThrow(CFriendRequestNotExistException::new);
+        Friend modifiedFriend = friendRepository.findByRequest(from_user, to_user, Status.ONGOING).orElseThrow(CFriendRequestNotExistException::new);
         modifiedFriend.updateStatus(status);
     }
 }

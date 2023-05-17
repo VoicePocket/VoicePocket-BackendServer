@@ -8,8 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 
 @Builder
 @Getter
@@ -31,9 +29,12 @@ public class Friend extends BaseEntity {
     private User request_to;
 
     @Column(name="status",nullable = false)
-    private Long status;
+    @Enumerated(EnumType.ORDINAL)
+    private Status status;
 
-    public void updateStatus(Long status){
+    public void updateStatus(Status status){
         this.status = status;
     }
+
 }
+
