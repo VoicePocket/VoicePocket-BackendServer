@@ -89,4 +89,13 @@ public class FriendService {
         Friend modifiedFriend = friendRepository.findByRequest(from_user, to_user, Status.ONGOING).orElseThrow(CFriendRequestNotExistException::new);
         modifiedFriend.updateStatus(status);
     }
+
+    @Transactional
+    public void delete(FriendRequestDto friendRequestDto, String accessToken, Status status){
+        Authentication authentication= getAuthByAccessToken(accessToken);
+        User from_user = userRepository.findById(Long.parseLong(authentication.getName())).orElseThrow(CUserNotFoundException::new);
+        User to_user = userRepository.findByEmail(friendRequestDto.getEmail()).orElseThrow(CUserNotFoundException::new);
+        Friend friend = friendRepository.findByRequest(from_user, to_user, status).orElseThrow(CFriendRequestNotExistException::new);
+        friendRepository.delete(friend);
+    }
 }
