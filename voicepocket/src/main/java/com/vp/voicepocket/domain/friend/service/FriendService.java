@@ -74,7 +74,7 @@ public class FriendService {
     public List<FriendResponseDto> checkRequest(String accessToken) {
         Authentication authentication= getAuthByAccessToken(accessToken);
         User to_user = userRepository.findById(Long.parseLong(authentication.getName())).orElseThrow(CUserNotFoundException::new);
-        return friendRepository.findByToUser(to_user)   // 없을 때 공백 리스트를 반환하기
+        return friendRepository.findByToUser(to_user, Status.ONGOING)   // 없을 때 공백 리스트를 반환하기
                 .stream()
                 .map(this::mapFriendEntityToFriendResponseDTO)
                 .collect(Collectors.toList());
