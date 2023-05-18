@@ -9,6 +9,7 @@ import com.vp.voicepocket.domain.friend.exception.CFriendRequestOnGoingException
 import com.vp.voicepocket.domain.friend.repository.FriendRepository;
 import com.vp.voicepocket.domain.token.config.JwtProvider;
 import com.vp.voicepocket.domain.token.exception.CAccessTokenException;
+import com.vp.voicepocket.domain.user.dto.response.UserResponseDto;
 import com.vp.voicepocket.domain.user.entity.User;
 import com.vp.voicepocket.domain.user.exception.CUserNotFoundException;
 import com.vp.voicepocket.domain.user.repository.UserRepository;
@@ -63,8 +64,8 @@ public class FriendService {
     private FriendResponseDto mapFriendEntityToFriendResponseDTO(Friend friend){
         return FriendResponseDto.builder()
                 .id(friend.getId())
-                .request_from(friend.getRequest_from())
-                .request_to(friend.getRequest_to())
+                .request_from(new UserResponseDto(friend.getRequest_from()))
+                .request_to(new UserResponseDto(friend.getRequest_to()))
                 .status(friend.getStatus())
                 .build();
     }
