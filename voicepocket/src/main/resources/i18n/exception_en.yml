@@ -31,3 +31,9 @@ taskNotFound:
 taskNotFinished:
   code: "-1009"
   msg: "task is not finished"
+friendRequestNotExist:
+  code: "-1010"
+  msg: "Friend Request Not Exist."
+friendRequestOnGoing:
+  code: "-1011"
+  msg: "Friend Request already on Going."

@@ -1,6 +1,6 @@
 spring:
   profiles:
-    include: local, private
+    include: docker, private
 
   messages:
     basename: i18n/exception

@@ -38,7 +38,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 	// json
-	implementation 'org.json:json:20210307'
+	implementation 'org.json:json:20220320'
 
 	// swagger3 (springdoc)
 	implementation 'org.springdoc:springdoc-openapi-ui:1.6.15'

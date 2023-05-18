@@ -31,3 +31,9 @@ taskNotFound:
 taskNotFinished:
   code: "-1009"
   msg: "해당 task는 아직 수행중입니다."
+friendRequestNotExist:
+  code: "-1010"
+  msg: "친구 요청이 존재하지 않습니다."
+friendRequestOnGoing:
+  code: "-1011"
+  msg: "친구 요청이 이미 진행중입니다."

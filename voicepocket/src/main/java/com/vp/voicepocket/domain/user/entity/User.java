@@ -48,7 +48,7 @@ public class User extends BaseEntity implements UserDetails {
 
     @PrePersist
     public void prePersist() {
-        this.isActive = this.isActive == null ? true : this.isActive;
+        this.isActive = this.isActive == null || this.isActive;
     }
 
     public void updateNickName(String nickName) {
