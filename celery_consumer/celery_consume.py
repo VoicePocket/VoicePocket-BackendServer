@@ -2,11 +2,23 @@ import redis, json
 
 from celery import Celery
 from celery import bootsteps
-from kombu import Consumer, Exchange, Queue
+from kombu import Consumer, Exchange, Queue, Connection
 
+# RabbitMQ Connection URL
+CONNECTION_URL = 'amqp://sample:sample!@rabbit:5672/rabbit_example'
+
+# Redis Connection URL
 rd = redis.Redis(host='voicepocket_redis', port=6379, db=0)
 
-queue = Queue("input.queue", Exchange("default"), "input.key")
+# RabbitMQ 연결 설정
+connection = Connection(CONNECTION_URL)
+producer = connection.Producer()
+
+# Exchange, Queue 설정
+input_exchange = Exchange("input.exchange")
+input_queue = Queue("input.queue", input_exchange, "input.key")
+output_exchange = Exchange("output.exchange")
+output_queue = Queue('output.queue', output_exchange, "output.key")
 
 app = Celery()
 app.config_from_object("celery_config")
@@ -18,8 +30,22 @@ def text_to_speech(uuid, email, text):
         add_synth(email)
 
     make_tts(email, uuid, text)
+    url_path = f"{email}/{uuid}.wav"
+
+    test_message = {"url": url_path}
+    publish_message(test_message)
         
-    return f"{email}/{uuid}.wav"
+    return url_path
+
+
+# publish message when TTS done
+def publish_message(message):
+    json_message = json.dumps(message)
+    
+    producer.publish(json_message, 
+                        exchange=output_exchange, 
+                        routing_key="output.key", 
+                        content_type="application/json")
 
 
 # Decalring the general input message handler
@@ -58,7 +84,7 @@ class ETLMessageHandler(object):
 class InputMessageConsumerStep(bootsteps.ConsumerStep):
     def get_consumers(self, channel):
         return [Consumer(channel,
-                         queues=[queue],
+                         queues=[input_queue],
                          callbacks=[self.handle_message],
                          accept=["json"])]
 
