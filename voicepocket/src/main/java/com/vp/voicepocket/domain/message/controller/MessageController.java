@@ -2,10 +2,8 @@ package com.vp.voicepocket.domain.message.controller;
 
 import com.vp.voicepocket.domain.message.dto.TaskIdResponseDto;
 import com.vp.voicepocket.domain.message.dto.TaskInfoResponseDto;
-import com.vp.voicepocket.domain.message.exception.CTaskNotFinishedException;
-import com.vp.voicepocket.domain.message.exception.CTaskNotFoundException;
-import com.vp.voicepocket.domain.message.model.Message;
-import com.vp.voicepocket.domain.message.service.MessageService;
+import com.vp.voicepocket.domain.message.model.InputMessage;
+import com.vp.voicepocket.domain.message.service.InputMessageService;
 import com.vp.voicepocket.global.common.response.model.SingleResult;
 import com.vp.voicepocket.global.common.response.service.ResponseService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,7 +12,6 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -24,7 +21,7 @@ import javax.validation.Valid;
 @Tag(name = "Message")
 @RequestMapping("/api")
 public class MessageController {
-    private final MessageService messageService;
+    private final InputMessageService inputMessageService;
     private final ResponseService responseService;
 
     @Parameter(
@@ -35,9 +32,9 @@ public class MessageController {
             in = ParameterIn.HEADER)
     @Operation(summary = "TTS 요청", description = "Text To Speech 서비스를 요청합니다.")
     @PostMapping("/tts/send")
-    public SingleResult<Message> send(@Valid @RequestBody Message message) {
-        messageService.sendMessage(message);
-        return responseService.getSingleResult(message);
+    public SingleResult<InputMessage> send(@Valid @RequestBody InputMessage inputMessage) {
+        inputMessageService.sendMessage(inputMessage);
+        return responseService.getSingleResult(inputMessage);
     }
 
     @Parameter(
@@ -49,7 +46,7 @@ public class MessageController {
     @Operation(summary = "TTS Task id 체크", description = "uuid로 TTS task id를 얻어옵니다.")
     @GetMapping("/tts/status/uuid/{uuid}")
     public SingleResult<TaskIdResponseDto> getTaskId(@PathVariable String uuid) {
-        return responseService.getSingleResult(messageService.getTaskId(uuid));
+        return responseService.getSingleResult(inputMessageService.getTaskId(uuid));
     }
 
     @Parameter(
@@ -61,6 +58,6 @@ public class MessageController {
     @Operation(summary = "TTS Task 체크", description = "task id로 TTS 작업의 진행상태를 봅니다.")
     @GetMapping("/tts/status/taskId/{taskId}")
     public SingleResult<TaskInfoResponseDto> getTaskStatus(@PathVariable String taskId) {
-        return responseService.getSingleResult(messageService.getTaskStatus(taskId));
+        return responseService.getSingleResult(inputMessageService.getTaskStatus(taskId));
     }
 }

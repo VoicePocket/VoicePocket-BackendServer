@@ -4,8 +4,7 @@ import com.vp.voicepocket.domain.message.dto.TaskIdResponseDto;
 import com.vp.voicepocket.domain.message.dto.TaskInfoResponseDto;
 import com.vp.voicepocket.domain.message.exception.CTaskNotFinishedException;
 import com.vp.voicepocket.domain.message.exception.CTaskNotFoundException;
-import com.vp.voicepocket.domain.message.model.Message;
-import lombok.Builder;
+import com.vp.voicepocket.domain.message.model.InputMessage;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -16,13 +15,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class MessageService {
-    private static final Logger log = LoggerFactory.getLogger(MessageService.class);
+public class InputMessageService {
+    private static final Logger log = LoggerFactory.getLogger(InputMessageService.class);
     private final RabbitTemplate rabbitTemplate;    // RabbitTemplate을 통해 Exchange에 메세지를 보내도록 설정
     private final StringRedisTemplate stringRedisTemplate;
 
-    public void sendMessage(Message message) {
-        rabbitTemplate.convertAndSend("default", "input.key", message);
+    public void sendMessage(InputMessage inputMessage) {
+        rabbitTemplate.convertAndSend("input.exchange", "input.key", inputMessage);
     }
 
     public TaskIdResponseDto getTaskId(String uuid) {
