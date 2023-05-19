@@ -9,8 +9,8 @@ import javax.validation.constraints.NotNull;
 
 @Getter @Setter
 @AllArgsConstructor
-@Schema(title = "Message 모델", description = "TTS 요청을 받을 Message 모델")
-public class Message {
+@Schema(title = "Input Message 모델", description = "TTS 요청을 받을 Message 모델")
+public class InputMessage {
     @NotNull
     @Schema(title = "Message type", description = "메시지 요청에 따른 타입", example = "ETL")
     private String type;
