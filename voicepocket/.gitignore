@@ -42,3 +42,4 @@ out/
 
 ### VS Code ###
 .vscode/
+/src/main/resources/firebase/voicepocket_firebase_service_key.json
