@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @Tag(name="FCM")
-@RequestMapping("/api")
+@RequestMapping("/test")
 @RequiredArgsConstructor
 @RestController
 public class FCMNotificationApiController {
