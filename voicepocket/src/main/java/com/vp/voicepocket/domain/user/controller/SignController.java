@@ -10,13 +10,12 @@ import com.vp.voicepocket.global.common.response.model.SingleResult;
 import com.vp.voicepocket.global.common.response.service.ResponseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @Slf4j
@@ -37,13 +36,20 @@ public class SignController {
         return responseService.getSingleResult(signupId);
     }
 
+    @Parameter(
+            name = "FCM-TOKEN",
+            description = "FCM Token",
+            required = true,
+            schema = @Schema(type = "string"),
+            in = ParameterIn.HEADER)
     @Operation(summary = "로그인", description = "이메일로 로그인을 합니다.")
     @PostMapping("/login")
     public SingleResult<TokenDto> login(
+            @RequestHeader("FCM-TOKEN") String fcmToken,
             @Parameter(description = "로그인 요청 DTO", required = true)
             @RequestBody UserLoginRequestDto userLoginRequestDto) {
 
-        TokenDto tokenDto = signService.login(userLoginRequestDto);
+        TokenDto tokenDto = signService.login(fcmToken, userLoginRequestDto);
         return responseService.getSingleResult(tokenDto);
     }
 

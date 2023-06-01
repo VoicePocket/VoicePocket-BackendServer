@@ -2,7 +2,6 @@ dump.rdb
 application-local.yml
 application-docker.yml
 application-private.yml
-application-docker.yml
 
 ###
 HELP.md
@@ -42,3 +41,4 @@ out/
 
 ### VS Code ###
 .vscode/
+/src/main/resources/firebase/voicepocket_firebase_service_key.json

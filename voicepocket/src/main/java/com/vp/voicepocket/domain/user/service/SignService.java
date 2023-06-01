@@ -1,6 +1,10 @@
 package com.vp.voicepocket.domain.user.service;
 
 
+
+import com.vp.voicepocket.domain.fcm.entity.FCMUserToken;
+import com.vp.voicepocket.domain.fcm.repository.FCMRepository;
+
 import com.vp.voicepocket.domain.token.config.JwtProvider;
 import com.vp.voicepocket.domain.token.dto.TokenDto;
 import com.vp.voicepocket.domain.token.dto.TokenRequestDto;
@@ -29,6 +33,7 @@ public class SignService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final FCMRepository fcmRepository;
 
     @Transactional
     public Long signup(UserSignupRequestDto userSignupRequestDto) {
@@ -39,7 +44,7 @@ public class SignService {
     }
 
     @Transactional
-    public TokenDto login(UserLoginRequestDto userLoginRequestDto) {
+    public TokenDto login(String fcmToken, UserLoginRequestDto userLoginRequestDto) {
         // 회원이 존재하는지 확인
         User user =
                 userRepository
@@ -53,6 +58,11 @@ public class SignService {
 
         // token 발급
         TokenDto tokenDto = jwtProvider.createTokenDto(user.getUserId(), user.getRoles(), user.getEmail());
+        if(fcmRepository.findByUserId(user).isEmpty()){
+            fcmRepository.save(FCMUserToken.builder().userId(user).FireBaseToken(fcmToken).build());
+        }else{
+            fcmRepository.findByUserId(user).orElseThrow().update(fcmToken);
+        }
 
         return tokenDto;
     }
