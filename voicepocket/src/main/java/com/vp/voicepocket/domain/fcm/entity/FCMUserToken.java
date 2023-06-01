@@ -1,16 +1,20 @@
 package com.vp.voicepocket.domain.fcm.entity;
 
 import com.vp.voicepocket.domain.user.entity.User;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-@Entity
+@Builder
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name="FCMUserToken")
-public class FCMUserToken {
+@Entity
+public class FCMUserToken{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

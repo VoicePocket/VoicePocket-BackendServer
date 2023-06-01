@@ -6,10 +6,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 
 @Repository
 public interface FCMRepository extends JpaRepository<FCMUserToken, Long> {
 
     @Query(value = "select fcm from FCMUserToken fcm where fcm.UserID = :userId")
-    FCMUserToken findByUserId(@Param("userId")Long userId);
+    Optional<FCMUserToken> findByUserId(@Param("userId")Long userId);
 }

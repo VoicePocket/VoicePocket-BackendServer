@@ -55,7 +55,7 @@ public class FriendService {
             throw new CFriendRequestOnGoingException();
         }
         Friend friend = friendRequestDto.toEntity(from_user, to_user, Status.ONGOING);
-        fcmNotificationRequestDto = new FCMNotificationRequestDto(fcmRepository.findByUserId(to_user.getUserId()).getFireBaseToken(), "Friend Request", from_user.getName()+" request Friend to you!");
+        fcmNotificationRequestDto = new FCMNotificationRequestDto(fcmRepository.findByUserId(to_user.getUserId()).orElseThrow().getFireBaseToken(), "Friend Request", from_user.getName()+" request Friend to you!");
         notification = Notification.builder().setTitle(fcmNotificationRequestDto.getTitle()).setBody(fcmNotificationRequestDto.getBody()).build();
         try {
             firebaseMessaging.send(Message.builder().setToken(fcmNotificationRequestDto.getFirebaseToken()).setNotification(notification).build());
@@ -106,7 +106,7 @@ public class FriendService {
         Friend modifiedFriend = friendRepository.findByRequest(from_user, to_user, Status.ONGOING).orElseThrow(CFriendRequestNotExistException::new);
         modifiedFriend.updateStatus(status);
         if(status.equals(Status.ACCEPT)){
-            fcmNotificationRequestDto = new FCMNotificationRequestDto(fcmRepository.findByUserId(from_user.getUserId()).getFireBaseToken(), "Friend Accept", to_user.getName()+" Accept your Friend Request!");
+            fcmNotificationRequestDto = new FCMNotificationRequestDto(fcmRepository.findByUserId(from_user.getUserId()).orElseThrow().getFireBaseToken(), "Friend Accept", to_user.getName()+" Accept your Friend Request!");
             notification = Notification.builder().setTitle(fcmNotificationRequestDto.getTitle()).setBody(fcmNotificationRequestDto.getBody()).build();
             try {
                 firebaseMessaging.send(Message.builder().setToken(fcmNotificationRequestDto.getFirebaseToken()).setNotification(notification).build());
