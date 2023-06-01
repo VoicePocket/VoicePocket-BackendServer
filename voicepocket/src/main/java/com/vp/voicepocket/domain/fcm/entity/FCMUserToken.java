@@ -15,7 +15,7 @@ public class FCMUserToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY, targetEntity = User.class)
+    @ManyToOne(fetch = FetchType.LAZY, targetEntity = User.class)
     @JoinColumn(name="UserId", nullable = false, referencedColumnName = "userId")
     private Long UserId;
 
