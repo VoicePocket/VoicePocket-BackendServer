@@ -1,6 +1,7 @@
 package com.vp.voicepocket.domain.fcm.repository;
 
 import com.vp.voicepocket.domain.fcm.entity.FCMUserToken;
+import com.vp.voicepocket.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,6 +13,6 @@ import java.util.Optional;
 @Repository
 public interface FCMRepository extends JpaRepository<FCMUserToken, Long> {
 
-    @Query(value = "select fcm from FCMUserToken fcm where fcm.UserID = :userId")
-    Optional<FCMUserToken> findByUserId(@Param("userId")Long userId);
+    @Query(value = "select fcm from FCMUserToken fcm where fcm.userId = :userId")
+    Optional<FCMUserToken> findByUserId(@Param("userId") User userId);
 }

@@ -12,5 +12,4 @@ import lombok.NoArgsConstructor;
 public class UserLoginRequestDto {
     private String email;
     private String password;
-    private String FCMToken;
 }

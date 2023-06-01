@@ -20,8 +20,8 @@ public class FCMUserToken{
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = User.class)
-    @JoinColumn(name="UserId", nullable = false, referencedColumnName = "userId")
-    private Long UserId;
+    @JoinColumn(name="userId", nullable = false, referencedColumnName = "userId")
+    private User userId;
 
     @Column(nullable = false)
     private String FireBaseToken;

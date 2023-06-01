@@ -44,7 +44,7 @@ public class SignService {
     }
 
     @Transactional
-    public TokenDto login(UserLoginRequestDto userLoginRequestDto) {
+    public TokenDto login(String fcmToken, UserLoginRequestDto userLoginRequestDto) {
         // 회원이 존재하는지 확인
         User user =
                 userRepository
@@ -58,10 +58,10 @@ public class SignService {
 
         // token 발급
         TokenDto tokenDto = jwtProvider.createTokenDto(user.getUserId(), user.getRoles(), user.getEmail());
-        if(fcmRepository.findByUserId(user.getUserId()).isEmpty()){
-            fcmRepository.save(FCMUserToken.builder().UserId(user.getUserId()).FireBaseToken(userLoginRequestDto.getFCMToken()).build());
+        if(fcmRepository.findByUserId(user).isEmpty()){
+            fcmRepository.save(FCMUserToken.builder().userId(user).FireBaseToken(fcmToken).build());
         }else{
-            fcmRepository.findByUserId(user.getUserId()).orElseThrow().update(userLoginRequestDto.getFCMToken());
+            fcmRepository.findByUserId(user).orElseThrow().update(fcmToken);
         }
 
         return tokenDto;
