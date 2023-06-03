@@ -24,16 +24,21 @@ app = Celery()
 app.config_from_object("celery_config")
 
 @app.task
-def text_to_speech(uuid, email, text):
-    from tts_process import add_synth, is_set, make_tts
-    if not is_set(email):
-        add_synth(email)
+def text_to_speech(uuid, email, text, sender_email):
+    try:
+        from tts_process import add_synth, is_set, make_tts
+        
+        if not is_set(email):
+            add_synth(email)
 
-    make_tts(email, uuid, text)
-    url_path = f"{email}/{uuid}.wav"
-
-    test_message = {"url": url_path}
-    publish_message(test_message)
+        make_tts(email, uuid, text)
+        url_path = f"{email}/{uuid}.wav"
+        message = {"requestFrom": sender_email, "result": "TTS Request Success!", "url":url_path}
+    
+    except Exception as e:
+        message = {"requestFrom": sender_email, "result": e, "url":url_path}
+    
+    publish_message(message)
         
     return url_path
 
@@ -73,10 +78,14 @@ class ETLMessageHandler(object):
         print(f"Working on ETL for message: {body}")
         # TODO: Calling out your Celery tasks here
         _uuid = body["uuid"]
-        _email = body["email"]
+        sender_email = body["requestFrom"]
+        reciever_email = body["requestTo"]
         _text = body["text"]
-        task = text_to_speech.delay(_uuid, _email, _text)
+        
+        task = text_to_speech.delay(_uuid, reciever_email, _text, sender_email)
+        
         _task_json = json.dumps({"task_id":task.id})
+        
         rd.set(_uuid, _task_json)
 
 
