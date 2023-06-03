@@ -23,7 +23,7 @@ import java.util.Map;
 public class OutputMessageService {
     private static final Logger log = LoggerFactory.getLogger(OutputMessageService.class);
     private static final String TTS_REQUEST = "음성 합성 요청 알림";
-    private static final String KEY = "wav_url";
+    private static final String KEY = "wavUrl";
     private final UserRepository userRepository;
     private final FCMRepository fcmRepository;
     private final FCMNotificationService fcmNotificationService;
