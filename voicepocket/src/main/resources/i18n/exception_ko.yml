@@ -31,3 +31,6 @@ friendRequestNotExist:
 friendRequestOnGoing:
   code: "-1011"
   msg: "친구 요청이 이미 진행중입니다."
+FCMTokenNotFound:
+  code: "-1012"
+  msg: "FCM 토큰이 존재하지 않습니다."
