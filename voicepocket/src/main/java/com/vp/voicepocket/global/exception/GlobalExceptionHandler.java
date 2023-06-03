@@ -1,9 +1,8 @@
 package com.vp.voicepocket.global.exception;
 
+import com.vp.voicepocket.domain.fcm.exception.CFCMTokenNotFoundException;
 import com.vp.voicepocket.domain.friend.exception.CFriendRequestNotExistException;
 import com.vp.voicepocket.domain.friend.exception.CFriendRequestOnGoingException;
-import com.vp.voicepocket.domain.message.exception.CTaskNotFinishedException;
-import com.vp.voicepocket.domain.message.exception.CTaskNotFoundException;
 import com.vp.voicepocket.domain.token.exception.*;
 import com.vp.voicepocket.domain.user.exception.CEmailLoginFailedException;
 import com.vp.voicepocket.domain.user.exception.CEmailSignUpFailedException;
@@ -140,31 +139,6 @@ public class GlobalExceptionHandler {
     }
 
     /***
-     * -1008
-     * TTS Task Id를 찾지 못했을 때 발생시키는 예외
-     */
-    @ExceptionHandler(CTaskNotFoundException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected CommonResult taskNotFoundException(
-            HttpServletRequest request, CTaskNotFoundException e) {
-        return responseService.getFailResult(
-                Integer.parseInt(getMessage("taskNotFound.code")), getMessage("taskNotFound.msg"));
-    }
-
-    /***
-     * -1009
-     * TTS Task가 아직 실행 중일 때 발생시키는 예외
-     */
-    @ExceptionHandler(CTaskNotFinishedException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected CommonResult taskNotFinishedException(
-            HttpServletRequest request, CTaskNotFinishedException e) {
-        return responseService.getFailResult(
-                Integer.parseInt(getMessage("taskNotFinished.code")), getMessage("taskNotFinished.msg"));
-    }
-
-
-    /***
      * -1010
      * 친구 추가 요청이 존재하지 않는 경우.
      */
@@ -186,5 +160,17 @@ public class GlobalExceptionHandler {
             HttpServletRequest request, CFriendRequestOnGoingException e){
         return responseService.getFailResult(
                 Integer.parseInt(getMessage("friendRequestOnGoing.code")), getMessage("friendRequestOnGoing.msg"));
+    }
+
+    /***
+     * -1012
+     * 유저를 찾지 못했을 때 발생시키는 예외
+     */
+    @ExceptionHandler(CFCMTokenNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected CommonResult userNotFoundException(
+            HttpServletRequest request, CFCMTokenNotFoundException e) {
+        return responseService.getFailResult(
+                Integer.parseInt(getMessage("FCMTokenNotFound.code")), getMessage("FCMTokenNotFound.msg"));
     }
 }

@@ -25,15 +25,12 @@ expiredAccessToken:
 accessTokenInValid:
   code: "-1007"
   msg: "AccessToken is not Valid"
-taskNotFound:
-  code: "-1008"
-  msg: "task id not exist"
-taskNotFinished:
-  code: "-1009"
-  msg: "task is not finished"
 friendRequestNotExist:
   code: "-1010"
   msg: "Friend Request Not Exist."
 friendRequestOnGoing:
   code: "-1011"
   msg: "Friend Request already on Going."
+FCMTokenNotFound:
+  code: "-1012"
+  msg: "FCM Token does not exist"
