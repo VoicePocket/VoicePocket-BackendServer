@@ -19,7 +19,7 @@ public class TTSRequestDto {
     private String uuid;
 
     @NotNull
-    @Schema(title = "Requested User Email", description = "음성 합성 요청을 받은 사용자의 이메일", example = "reciever@gmail.com")
+    @Schema(title = "Requested User Email", description = "음성 합성 요청을 받은 사용자의 이메일", example = "ssh@gmail.com")
     private String requestTo;
 
     @NotNull

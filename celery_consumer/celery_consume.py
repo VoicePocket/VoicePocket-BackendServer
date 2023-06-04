@@ -1,4 +1,4 @@
-import redis, json
+import json
 
 from celery import Celery
 from celery import bootsteps
@@ -6,9 +6,6 @@ from kombu import Consumer, Exchange, Queue, Connection
 
 # RabbitMQ Connection URL
 CONNECTION_URL = 'amqp://sample:sample!@rabbit:5672/rabbit_example'
-
-# Redis Connection URL
-rd = redis.Redis(host='voicepocket_redis', port=6379, db=0)
 
 # RabbitMQ 연결 설정
 connection = Connection(CONNECTION_URL)
@@ -27,12 +24,13 @@ app.config_from_object("celery_config")
 def text_to_speech(uuid, email, text, sender_email):
     try:
         from tts_process import add_synth, is_set, make_tts
-        
+        url_path = f"{email}/{uuid}.wav"
+
         if not is_set(email):
             add_synth(email)
 
         make_tts(email, uuid, text)
-        url_path = f"{email}/{uuid}.wav"
+        
         message = {"requestFrom": sender_email, "result": "TTS Request Success!", "url":url_path}
     
     except Exception as e:
@@ -83,10 +81,6 @@ class ETLMessageHandler(object):
         _text = body["text"]
         
         task = text_to_speech.delay(_uuid, reciever_email, _text, sender_email)
-        
-        _task_json = json.dumps({"task_id":task.id})
-        
-        rd.set(_uuid, _task_json)
 
 
 # Declaring the bootstep for our purposes

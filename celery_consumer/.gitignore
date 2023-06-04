@@ -7,3 +7,4 @@ wav/*.wav
 voicepocket-bucketKey.json
 .DS_Store
 .erlang.cookie
+synth/*
