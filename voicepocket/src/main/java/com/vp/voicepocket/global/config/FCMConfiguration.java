@@ -17,7 +17,6 @@ import java.util.Objects;
 public class FCMConfiguration {
     @Bean
     FirebaseMessaging firebaseMessaging() throws IOException{
-        //TODO: Add Firebase Private admin Key Path on FIREBASE_PATH!
         ClassPathResource resource = new ClassPathResource("firebase/voicepocket_firebase_service_key.json");
         InputStream refreshToken = resource.getInputStream();
 

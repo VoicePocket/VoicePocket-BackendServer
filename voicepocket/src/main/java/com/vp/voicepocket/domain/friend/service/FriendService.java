@@ -84,7 +84,6 @@ public class FriendService {
                 .build();
     }
 
-    // TODO: Should Check Proxy Problem?
     @Transactional
     public List<FriendResponseDto> checkRequest(String accessToken) {
         Authentication authentication= getAuthByAccessToken(accessToken);

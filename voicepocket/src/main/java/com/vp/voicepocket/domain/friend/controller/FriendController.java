@@ -56,7 +56,6 @@ public class FriendController {
         return responseService.getListResult(friendService.checkRequest(accessToken));
     }
 
-    // TODO: 친구 요청 취소
     @Parameter(
             name = "X-AUTH-TOKEN",
             description = "로그인 성공 후 AccessToken",
@@ -73,7 +72,6 @@ public class FriendController {
         return responseService.getSuccessResult();
     }
 
-    // TODO: 어차피 요청에 대한 수락 및 거절을 하는 것이니 하나로 묶어서 PUT Mapping 으로 받는 게 좋을 것 같다.
     @Parameter(
             name = "X-AUTH-TOKEN",
             description = "로그인 성공 후 AccessToken",
