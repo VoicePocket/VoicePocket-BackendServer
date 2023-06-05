@@ -94,6 +94,16 @@ public class FriendService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
+    public List<FriendResponseDto> checkResponse(String accessToken) {
+        Authentication authentication= getAuthByAccessToken(accessToken);
+        User from_user = userRepository.findById(Long.parseLong(authentication.getName())).orElseThrow(CUserNotFoundException::new);
+        return friendRepository.findByFromUser(from_user, Status.ACCEPT)   // 없을 때 공백 리스트를 반환하기
+                .stream()
+                .map(this::mapFriendEntityToFriendResponseDTO)
+                .collect(Collectors.toList());
+    }
+
 
     @Transactional
     public void update(FriendRequestDto friendRequestDto, String accessToken, Status status){

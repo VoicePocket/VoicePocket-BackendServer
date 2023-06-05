@@ -17,8 +17,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-// TODO: 나의 친구 목록 확인(내가 팔로우하는 사람들 목록)
-// /api/friends
 @Slf4j
 @Tag(name = "Friend")
 @RequestMapping("/api")
@@ -56,6 +54,18 @@ public class FriendController {
     @GetMapping("/friend/requests")
     public ListResult<FriendResponseDto> checkRequest(@RequestHeader("X-AUTH-TOKEN") String accessToken) {
         return responseService.getListResult(friendService.checkRequest(accessToken));
+    }
+
+    @Parameter(
+            name = "X-AUTH-TOKEN",
+            description = "로그인 성공 후 AccessToken",
+            required = true,
+            schema = @Schema(type = "string"),
+            in = ParameterIn.HEADER)
+    @Operation(summary = "친구 요청 리스트 확인", description = "나에게 온 친구 요청을 확인합니다.")
+    @GetMapping("/friend")
+    public ListResult<FriendResponseDto> checkResponse(@RequestHeader("X-AUTH-TOKEN") String accessToken) {
+        return responseService.getListResult(friendService.checkResponse(accessToken));
     }
 
     @Parameter(
