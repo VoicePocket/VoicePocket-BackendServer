@@ -19,16 +19,42 @@ repositories {
 }
 
 dependencies {
-	// implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	// implementation 'org.springframework.boot:spring-boot-starter-security'
+	// spring web
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-amqp'
-	compileOnly 'org.projectlombok:lombok'
-	// runtimeOnly 'com.mysql:mysql-connector-j'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	// spring data jpa
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+	// spring boot security 의존성
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'io.jsonwebtoken:jjwt:0.9.1'
 	// testImplementation 'org.springframework.security:spring-security-test'
+
+	// rabbitmq
+	implementation 'org.springframework.boot:spring-boot-starter-amqp'
 	testImplementation 'org.springframework.amqp:spring-rabbit-test'
+
+	// json
+	implementation 'org.json:json:20220320'
+
+	// swagger3 (springdoc)
+	implementation 'org.springdoc:springdoc-openapi-ui:1.6.15'
+
+	// 메시지 다국화 i18n 의존성 추가
+	implementation 'net.rakugakibox.util:yaml-resource-bundle:1.1'
+
+	// mysql
+	runtimeOnly 'com.mysql:mysql-connector-j'
+
+	// lombok
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	// test
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	// Google Firebase Control Message
+	implementation 'com.google.firebase:firebase-admin:9.1.1'
 }
 
 tasks.named('test') {

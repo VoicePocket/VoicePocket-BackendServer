@@ -1,3 +1,10 @@
 spring:
   profiles:
-    include: local
+    include: docker, private
+
+  messages:
+    basename: i18n/exception
+    encoding: UTF-8
+
+springdoc:
+  packages-to-scan: com.vp.voicepocket

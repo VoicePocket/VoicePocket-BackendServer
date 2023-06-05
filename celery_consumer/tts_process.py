@@ -1,14 +1,12 @@
 import os, sys, tarfile, pickle
-# sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
 from TTS.utils.synthesizer import Synthesizer
 from text_process import normalize_text
 from bucket_process import down_model_from_bucket, upload_wav_to_bucket
 
+
 def is_set(email):
-    if synth_dict.get(email) == None:
-        return False
-    return True
+    return os.path.exists(f'./synth/{email}_synth.p')
 
 def add_synth(email):
     # TODO: best 모델 구성이 결정되면 그에 맞춰 코드를 수정할 것!
@@ -20,23 +18,27 @@ def add_synth(email):
     #     best_model_tar = tarfile.open(voice_model_path)
     #     best_model_tar.extractall(f"./api_server/voice_model")
 
-    synthesizer = Synthesizer(
-        tts_checkpoint="./voice_model_new/Glow_TTS_best_model.pth",
-        tts_config_path="./voice_model_new/Glow_TTS_config.json",
-        vocoder_checkpoint="./voice_model_new/HiFi_GAN_best_model.pth",
-        vocoder_config="./voice_model_new/HiFi_GAN_config.json"
-    )
+    if email == "ssh@gmail.com":
+        synthesizer = Synthesizer(
+            tts_checkpoint = "./voice_model_new/ssh_checkpoint_84000.pth",
+            tts_config_path = "./voice_model_new/ssh_config.json"
+        )
+    else:
+        synthesizer = Synthesizer(
+            tts_checkpoint = "./voice_model_new/best_model.pth",
+            tts_config_path = "./voice_model_new/config.json"
+        )
 
-    synth_dict[email] = synthesizer
-    
-    with open("./synthesizer.pickle","wb") as fw:
-        pickle.dump(synth_dict, fw)
-    
-    # os.remove(voice_model_path)
+    with open(f'./synth/{email}_synth.p', 'wb') as p:
+        pickle.dump(synthesizer, p)
 
+    
 def make_tts(email, uuid, text):
     wav_path = f'./wav/{uuid}.wav'
-    syn = synth_dict.get(email)
+    
+    with open(f'./synth/{email}_synth.p', 'rb') as p:
+        syn = pickle.load(p)
+
     symbol = syn.tts_config.characters.characters
     text = normalize_text(text, symbol)
     wav = syn.tts(text, None, None)
@@ -45,8 +47,3 @@ def make_tts(email, uuid, text):
     upload_wav_to_bucket(wav_path, email, uuid)
     
     os.remove(wav_path)
-
-synth_dict = {}
-
-with open("./synthesizer.pickle","rb") as fr:
-    synth_dict = pickle.load(fr)

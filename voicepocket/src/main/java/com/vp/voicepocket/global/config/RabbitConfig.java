@@ -1,5 +1,10 @@
 package com.vp.voicepocket.global.config;
 
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.DirectExchange;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -28,10 +33,33 @@ public class RabbitConfig {
     private int port;
 
     @Bean
+    Queue queue() {
+        return new Queue("output.queue", true);
+    }
+
+    @Bean
+    DirectExchange directExchange() {
+        return new DirectExchange("output.exchange");
+    }
+
+    @Bean
+    Binding binding(DirectExchange directExchange, Queue queue) {
+        return BindingBuilder.bind(queue).to(directExchange).with("output.key");
+    }
+
+    @Bean
     RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory, MessageConverter messageConverter) {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         rabbitTemplate.setMessageConverter(messageConverter);
         return rabbitTemplate;
+    }
+
+    @Bean
+    SimpleRabbitListenerContainerFactory simpleRabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
+        final SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory);
+        factory.setMessageConverter(messageConverter());
+        return factory;
     }
 
     @Bean

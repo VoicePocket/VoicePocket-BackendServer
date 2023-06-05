@@ -3,7 +3,6 @@ from unicodedata import normalize
 
 import g2pk
 
-#from g2pk import g2pk, english, utils, numerals
 
 def normalize_text(text, symbols):
     text = text.strip()
