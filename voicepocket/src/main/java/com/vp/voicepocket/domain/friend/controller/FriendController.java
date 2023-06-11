@@ -62,7 +62,7 @@ public class FriendController {
             required = true,
             schema = @Schema(type = "string"),
             in = ParameterIn.HEADER)
-    @Operation(summary = "친구 요청 리스트 확인", description = "나에게 온 친구 요청을 확인합니다.")
+    @Operation(summary = "친구 리스트 조회", description = "내 친구 리스트를 조회합니다.")
     @GetMapping("/friend")
     public ListResult<FriendResponseDto> checkResponse(@RequestHeader("X-AUTH-TOKEN") String accessToken) {
         return responseService.getListResult(friendService.checkResponse(accessToken));

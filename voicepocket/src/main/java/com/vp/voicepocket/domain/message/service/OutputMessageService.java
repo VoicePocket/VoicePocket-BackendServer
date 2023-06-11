@@ -23,7 +23,8 @@ import java.util.Map;
 public class OutputMessageService {
     private static final Logger log = LoggerFactory.getLogger(OutputMessageService.class);
     private static final String TTS_REQUEST = "음성 합성 요청 알림";
-    private static final String KEY = "wavUrl";
+    private static final String WAV_URL = "wavUrl";
+    private static final String PUSH_TYPE = "ID";
     private final UserRepository userRepository;
     private final FCMRepository fcmRepository;
     private final FCMNotificationService fcmNotificationService;
@@ -42,14 +43,16 @@ public class OutputMessageService {
         // fcm token 으로 push 알림을 보냄
         String messageBody = outputMessage.getRequestFrom() + " " + outputMessage.getResult();
 
+        Map<String, String> data = new HashMap<>();
+        data.put(WAV_URL, outputMessage.getUrl());
+        data.put(PUSH_TYPE, "3");
+
         FCMNotificationRequestDto requestDto = FCMNotificationRequestDto.builder()
                 .firebaseToken(fcmToken)
                 .title(TTS_REQUEST)
                 .body(messageBody)
+                .data(data)
                 .build();
-
-        Map<String, String> data = new HashMap<>();
-        data.put(KEY, outputMessage.getUrl());
 
         try {
             fcmNotificationService.sendNotificationWithData(requestDto, data);

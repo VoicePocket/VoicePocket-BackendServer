@@ -24,6 +24,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,7 +56,9 @@ public class FriendService {
             throw new CFriendRequestOnGoingException();
         }
         Friend friend = friendRequestDto.toEntity(from_user, to_user, Status.ONGOING);
-        fcmNotificationRequestDto = new FCMNotificationRequestDto(fcmRepository.findByUserId(to_user).orElseThrow().getFireBaseToken(), "Friend Request", from_user.getName()+" request Friend to you!");
+        HashMap<String, Integer> data = new HashMap<>();
+        data.put("ID", 1);
+        fcmNotificationRequestDto = new FCMNotificationRequestDto(fcmRepository.findByUserId(to_user).orElseThrow().getFireBaseToken(), "Friend Request", from_user.getName()+" request Friend to you!",data);
         notification = Notification.builder().setTitle(fcmNotificationRequestDto.getTitle()).setBody(fcmNotificationRequestDto.getBody()).build();
         try {
             firebaseMessaging.send(Message.builder().setToken(fcmNotificationRequestDto.getFirebaseToken()).setNotification(notification).build());
@@ -115,7 +118,9 @@ public class FriendService {
         Friend modifiedFriend = friendRepository.findByRequest(from_user, to_user, Status.ONGOING).orElseThrow(CFriendRequestNotExistException::new);
         modifiedFriend.updateStatus(status);
         if(status.equals(Status.ACCEPT)){
-            fcmNotificationRequestDto = new FCMNotificationRequestDto(fcmRepository.findByUserId(from_user).orElseThrow().getFireBaseToken(), "Friend Accept", to_user.getName()+" Accept your Friend Request!");
+            HashMap<String, Integer> data = new HashMap<>();
+            data.put("ID", 2);
+            fcmNotificationRequestDto = new FCMNotificationRequestDto(fcmRepository.findByUserId(from_user).orElseThrow().getFireBaseToken(), "Friend Accept", to_user.getName()+" Accept your Friend Request!", data);
             notification = Notification.builder().setTitle(fcmNotificationRequestDto.getTitle()).setBody(fcmNotificationRequestDto.getBody()).build();
             try {
                 firebaseMessaging.send(Message.builder().setToken(fcmNotificationRequestDto.getFirebaseToken()).setNotification(notification).build());
