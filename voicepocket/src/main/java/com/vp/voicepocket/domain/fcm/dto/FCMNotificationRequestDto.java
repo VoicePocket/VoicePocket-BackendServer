@@ -12,11 +12,11 @@ public class FCMNotificationRequestDto {
     private String firebaseToken;
     private String title;
     private String body;
-    private Map<String, Integer> data;
+    private Map<?, ?> data;
     //private String image;
 
     @Builder
-    public FCMNotificationRequestDto(String firebaseToken, String title, String body, Map<String, Integer> data)  {
+    public FCMNotificationRequestDto(String firebaseToken, String title, String body, Map<?, ?> data)  {
         this.firebaseToken = firebaseToken;
         this.title = title;
         this.body = body;
