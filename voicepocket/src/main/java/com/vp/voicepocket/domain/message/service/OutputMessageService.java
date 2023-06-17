@@ -51,13 +51,8 @@ public class OutputMessageService {
                 .firebaseToken(fcmToken)
                 .title(TTS_REQUEST)
                 .body(messageBody)
-                .data(data)
                 .build();
 
-        try {
-            fcmNotificationService.sendNotificationWithData(requestDto, data);
-        } catch (Exception e) {
-            log.info(e.getMessage());
-        }
+        fcmNotificationService.sendNotificationWithData(requestDto, data);
     }
 }
