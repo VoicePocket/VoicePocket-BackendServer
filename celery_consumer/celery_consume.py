@@ -31,10 +31,10 @@ def text_to_speech(uuid, email, text, sender_email):
 
         make_tts(email, uuid, text)
         
-        message = {"requestFrom": sender_email, "result": "TTS Request Success!", "url":url_path}
+        message = {"requestFrom": sender_email, "requestTo":email,"result": "TTS Request Success!", "url":url_path, "uuid": uuid}
     
     except Exception as e:
-        message = {"requestFrom": sender_email, "result": e, "url":url_path}
+        message = {"requestFrom": sender_email, "requestTo":email,"result": e, "url":url_path, "uuid":uuid}
     
     publish_message(message)
         
