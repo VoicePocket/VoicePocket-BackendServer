@@ -17,10 +17,18 @@ public class OutputMessage {
     private String requestFrom;
 
     @NotNull
+    @Schema(title = "Request To User", description = "음성 합성 모델 Email")
+    private String requestTo;
+
+    @NotNull
     @Schema(title = "TTS 요청에 대한 결과", description = "TTS 요청에 대한 성공/실패 여부")
     private String result;
 
     @NotNull
     @Schema(title = "wav url", description = "합성된 음성 url")
     private String url;
+
+    @NotNull
+    @Schema(title = "uuid", description = "UUID")
+    private String uuid;
 }
