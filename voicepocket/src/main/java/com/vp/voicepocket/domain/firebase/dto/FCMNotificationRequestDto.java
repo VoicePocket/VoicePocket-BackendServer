@@ -1,4 +1,4 @@
-package com.vp.voicepocket.domain.fcm.dto;
+package com.vp.voicepocket.domain.firebase.dto;
 
 import lombok.Builder;
 import lombok.Getter;

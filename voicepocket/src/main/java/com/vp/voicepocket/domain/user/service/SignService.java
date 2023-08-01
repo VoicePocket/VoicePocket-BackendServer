@@ -2,8 +2,8 @@ package com.vp.voicepocket.domain.user.service;
 
 
 
-import com.vp.voicepocket.domain.fcm.entity.FCMUserToken;
-import com.vp.voicepocket.domain.fcm.repository.FCMRepository;
+import com.vp.voicepocket.domain.firebase.entity.FCMUserToken;
+import com.vp.voicepocket.domain.firebase.repository.FCMRepository;
 
 import com.vp.voicepocket.domain.token.config.JwtProvider;
 import com.vp.voicepocket.domain.token.dto.TokenDto;

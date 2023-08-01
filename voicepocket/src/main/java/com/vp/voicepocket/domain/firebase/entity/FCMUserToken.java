@@ -1,4 +1,4 @@
-package com.vp.voicepocket.domain.fcm.entity;
+package com.vp.voicepocket.domain.firebase.entity;
 
 import com.vp.voicepocket.domain.user.entity.User;
 import lombok.AllArgsConstructor;

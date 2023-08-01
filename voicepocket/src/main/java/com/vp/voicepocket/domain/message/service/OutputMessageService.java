@@ -1,10 +1,11 @@
 package com.vp.voicepocket.domain.message.service;
 
-import com.vp.voicepocket.domain.fcm.dto.FCMNotificationRequestDto;
-import com.vp.voicepocket.domain.fcm.entity.FCMUserToken;
-import com.vp.voicepocket.domain.fcm.exception.CFCMTokenNotFoundException;
-import com.vp.voicepocket.domain.fcm.repository.FCMRepository;
-import com.vp.voicepocket.domain.fcm.service.FCMNotificationService;
+import com.vp.voicepocket.domain.firebase.dto.FCMNotificationRequestDto;
+import com.vp.voicepocket.domain.firebase.entity.FCMUserToken;
+import com.vp.voicepocket.domain.firebase.exception.CFCMTokenNotFoundException;
+import com.vp.voicepocket.domain.firebase.repository.FCMRepository;
+import com.vp.voicepocket.domain.firebase.service.FCMNotificationService;
+import com.vp.voicepocket.domain.firebase.service.FirestoreService;
 import com.vp.voicepocket.domain.message.model.OutputMessage;
 import com.vp.voicepocket.domain.user.entity.User;
 import com.vp.voicepocket.domain.user.exception.CUserNotFoundException;
@@ -28,6 +29,7 @@ public class OutputMessageService {
     private final UserRepository userRepository;
     private final FCMRepository fcmRepository;
     private final FCMNotificationService fcmNotificationService;
+    private final FirestoreService firestoreService;
 
     @RabbitListener(queues = "output.queue")
     public void consume(OutputMessage outputMessage) {
@@ -40,6 +42,8 @@ public class OutputMessageService {
                 .orElseThrow(CFCMTokenNotFoundException::new);
         String fcmToken = fcmEntity.getFireBaseToken();
 
+        // TODO: 친구 경우에 모델 Email이 필요해요! 이부분은 추후에 수정해봅시다.
+        firestoreService.addWavUrl(user.getEmail(), "모델 email 필요..", outputMessage.getUrl());
         // fcm token 으로 push 알림을 보냄
         String messageBody = outputMessage.getRequestFrom() + " " + outputMessage.getResult();
 

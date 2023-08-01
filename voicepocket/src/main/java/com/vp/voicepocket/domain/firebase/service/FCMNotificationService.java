@@ -1,10 +1,10 @@
-package com.vp.voicepocket.domain.fcm.service;
+package com.vp.voicepocket.domain.firebase.service;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
-import com.vp.voicepocket.domain.fcm.dto.FCMNotificationRequestDto;
+import com.vp.voicepocket.domain.firebase.dto.FCMNotificationRequestDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

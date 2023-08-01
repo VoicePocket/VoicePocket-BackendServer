@@ -1,10 +1,10 @@
 package com.vp.voicepocket.domain.friend.service;
 
-import com.vp.voicepocket.domain.fcm.dto.FCMNotificationRequestDto;
-import com.vp.voicepocket.domain.fcm.entity.FCMUserToken;
-import com.vp.voicepocket.domain.fcm.exception.CFCMTokenNotFoundException;
-import com.vp.voicepocket.domain.fcm.repository.FCMRepository;
-import com.vp.voicepocket.domain.fcm.service.FCMNotificationService;
+import com.vp.voicepocket.domain.firebase.dto.FCMNotificationRequestDto;
+import com.vp.voicepocket.domain.firebase.entity.FCMUserToken;
+import com.vp.voicepocket.domain.firebase.exception.CFCMTokenNotFoundException;
+import com.vp.voicepocket.domain.firebase.repository.FCMRepository;
+import com.vp.voicepocket.domain.firebase.service.FCMNotificationService;
 import com.vp.voicepocket.domain.friend.dto.request.FriendRequestDto;
 import com.vp.voicepocket.domain.friend.dto.response.FriendResponseDto;
 import com.vp.voicepocket.domain.friend.entity.Friend;
