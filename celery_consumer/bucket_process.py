@@ -2,7 +2,7 @@ import os
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="./voicepocket-bucketKey.json"
 
 from google.cloud import storage
-BUCKET_NAME = 'voicepocket'
+BUCKET_NAME = 'voice_pocket_egg'
 """
 bucket_name: 서비스 계정 생성한 bucket 이름 입력
 
