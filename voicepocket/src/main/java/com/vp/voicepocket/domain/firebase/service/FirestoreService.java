@@ -17,15 +17,15 @@ import java.util.Map;
 public class FirestoreService {
     private final Firestore firestore;
 
-    // TODO: 마지막 DOCUMENT 이름 규칙을 아직 안정해서 공백으로 둠 확인 필요
     public void addWavUrl(String userEmail, String modelEmail, String wavUrl, String uuid){
+        String GCP_OPEN_URL = "https://storage.googleapis.com/voice_pocket_egg/";
         DocumentReference docRef = firestore
                 .collection("users")
                 .document(userEmail)
                 .collection(userEmail.equals(modelEmail)?"message":modelEmail)
                 .document(uuid);
         Map<String, Object> data = new HashMap<>();
-        data.put("message", wavUrl);
+        data.put("message", GCP_OPEN_URL +wavUrl);
         data.put("sender", "SERVER");
         data.put("time", System.currentTimeMillis());
         ApiFuture<WriteResult> result = docRef.set(data);
