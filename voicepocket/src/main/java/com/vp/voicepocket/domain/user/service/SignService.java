@@ -63,7 +63,7 @@ public class SignService {
         }else{
             fcmRepository.findByUserId(user).orElseThrow().update(fcmToken);
         }
-
+        refreshTokenRepository.save(tokenDto.toEntity(user));
         return tokenDto;
     }
 
