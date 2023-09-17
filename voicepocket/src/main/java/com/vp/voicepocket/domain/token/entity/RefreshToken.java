@@ -24,9 +24,8 @@ public class RefreshToken extends BaseEntity {  // 추후 expire 시간과 비�
     @Column(nullable = false)
     private String token;
 
-    public RefreshToken updateToken(String token) {
+    public void updateToken(String token) {
         this.token = token;
-        return this;
     }
 
     @Builder

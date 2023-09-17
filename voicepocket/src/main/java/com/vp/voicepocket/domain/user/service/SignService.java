@@ -1,10 +1,8 @@
 package com.vp.voicepocket.domain.user.service;
 
 
-
 import com.vp.voicepocket.domain.firebase.entity.FCMUserToken;
 import com.vp.voicepocket.domain.firebase.repository.FCMRepository;
-
 import com.vp.voicepocket.domain.token.config.JwtProvider;
 import com.vp.voicepocket.domain.token.dto.TokenDto;
 import com.vp.voicepocket.domain.token.dto.TokenRequestDto;
@@ -20,7 +18,6 @@ import com.vp.voicepocket.domain.user.exception.CUserNotFoundException;
 import com.vp.voicepocket.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,12 +55,22 @@ public class SignService {
 
         // token 발급
         TokenDto tokenDto = jwtProvider.createTokenDto(user.getUserId(), user.getRoles(), user.getEmail());
-        if(fcmRepository.findByUserId(user).isEmpty()){
+
+        if (refreshTokenRepository.findByKey(user.getUserId()).isPresent()) {
+            RefreshToken refreshToken = refreshTokenRepository.findByKey(user.getUserId()).get();
+            refreshToken.updateToken(tokenDto.getRefreshToken());
+        } else {
+            refreshTokenRepository.save(tokenDto.toEntity(user));
+        }
+
+        // FCM TOKEN ADD or UPDATE
+        if (fcmRepository.findByUserId(user).isEmpty()) {
             fcmRepository.save(FCMUserToken.builder().userId(user).FireBaseToken(fcmToken).build());
-        }else{
+        } else{
+
             fcmRepository.findByUserId(user).orElseThrow().update(fcmToken);
         }
-        refreshTokenRepository.save(tokenDto.toEntity(user));
+
         return tokenDto;
     }
 
@@ -74,27 +81,18 @@ public class SignService {
             throw new CRefreshTokenException();
         }
 
-        // AccessToken 에서 Username (pk) 가져오기
-        String accessToken = tokenRequestDto.getAccessToken();
-        Authentication authentication = jwtProvider.getAuthentication(accessToken);
+        // RefreshTokenRepository 에서 Username (pk) 가져오기
+        String refreshToken = tokenRequestDto.getRefreshToken();
+        RefreshToken refreshTokenEntity = refreshTokenRepository.findByToken(refreshToken)
+                .orElseThrow(CRefreshTokenException::new);
 
         // user pk로 유저 검색 / repo 에 저장된 Refresh Token 가져오기
         User user =
                 userRepository
-                        .findById(Long.parseLong(authentication.getName()))
+                        .findById(refreshTokenEntity.getKey())
                         .orElseThrow(CUserNotFoundException::new);
-        RefreshToken refreshToken =
-                refreshTokenRepository.findByKey(user.getUserId()).orElseThrow(CRefreshTokenException::new);
-
-        // 리프레시 토큰 불일치 에러
-        if (!refreshToken.getToken().equals(tokenRequestDto.getRefreshToken()))
-            throw new CRefreshTokenException();
 
         // AccessToken, RefreshToken 토큰 재발급, 리프레쉬 토큰 저장
-        TokenDto newCreatedToken = jwtProvider.createTokenDto(user.getUserId(), user.getRoles(), user.getEmail());
-        RefreshToken updateRefreshToken = refreshToken.updateToken(newCreatedToken.getRefreshToken());
-        refreshTokenRepository.save(updateRefreshToken);
-
-        return newCreatedToken;
+        return jwtProvider.updateAccessTokenDto(user.getUserId(), user.getRoles(), refreshToken);
     }
 }
