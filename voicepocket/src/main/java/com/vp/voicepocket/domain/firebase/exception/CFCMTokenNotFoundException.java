@@ -1,4 +1,4 @@
-package com.vp.voicepocket.domain.fcm.exception;
+package com.vp.voicepocket.domain.firebase.exception;
 
 public class CFCMTokenNotFoundException extends RuntimeException {
     public CFCMTokenNotFoundException(String message, Throwable cause) {

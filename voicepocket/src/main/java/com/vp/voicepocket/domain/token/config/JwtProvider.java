@@ -67,6 +67,29 @@ public class JwtProvider {
                 .build();
     }
 
+    public TokenDto updateAccessTokenDto(Long userPk, List<String> roles, String refreshToken) {
+        Claims claims = Jwts.claims().setSubject(String.valueOf(userPk));
+        claims.put(ROLES, roles);
+
+        Date now = new Date();
+
+        String accessToken =
+                Jwts.builder()
+                        .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
+                        .setClaims(claims)
+                        .setIssuedAt(now)
+                        .setExpiration(new Date(now.getTime() + accessTokenValidMillisecond))
+                        .signWith(SignatureAlgorithm.HS256, secretKey)
+                        .compact();
+
+        return TokenDto.builder()
+                .grantType("Bearer")
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .accessTokenExpireDate(accessTokenValidMillisecond)
+                .build();
+    }
+
     // Jwt 토큰 복호화해서 가져오기
     private Claims parseClaims(String token) {
         try {

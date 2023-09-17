@@ -1,6 +1,6 @@
 package com.vp.voicepocket.global.exception;
 
-import com.vp.voicepocket.domain.fcm.exception.CFCMTokenNotFoundException;
+import com.vp.voicepocket.domain.firebase.exception.CFCMTokenNotFoundException;
 import com.vp.voicepocket.domain.friend.exception.CFriendRequestNotExistException;
 import com.vp.voicepocket.domain.friend.exception.CFriendRequestOnGoingException;
 import com.vp.voicepocket.domain.token.exception.*;
