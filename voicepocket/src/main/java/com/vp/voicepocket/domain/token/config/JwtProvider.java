@@ -135,4 +135,10 @@ public class JwtProvider {
         }
         return false;
     }
+
+    public boolean checkValidationToken(String token){
+        Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+        return true;
+    }
+
 }
