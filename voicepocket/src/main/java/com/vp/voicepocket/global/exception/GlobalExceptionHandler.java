@@ -9,6 +9,7 @@ import com.vp.voicepocket.domain.user.exception.CEmailSignUpFailedException;
 import com.vp.voicepocket.domain.user.exception.CUserNotFoundException;
 import com.vp.voicepocket.global.common.response.model.CommonResult;
 import com.vp.voicepocket.global.common.response.service.ResponseService;
+import io.jsonwebtoken.MalformedJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -138,6 +139,13 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(MalformedJwtException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    protected CommonResult malformedJwtException(HttpServletRequest request, MalformedJwtException e){
+        return responseService.getFailResult(
+                Integer.parseInt(getMessage("malformedToken.code")), getMessage("malformedToken.msg")
+        );
+    }
     /***
      * -1010
      * 친구 추가 요청이 존재하지 않는 경우.

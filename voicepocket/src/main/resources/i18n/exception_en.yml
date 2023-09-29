@@ -25,6 +25,9 @@ expiredAccessToken:
 accessTokenInValid:
   code: "-1007"
   msg: "AccessToken is not Valid"
+malformedToken:
+  code: "-1008"
+  msg: "Malformed Token"
 friendRequestNotExist:
   code: "-1010"
   msg: "Friend Request Not Exist."

@@ -1,9 +1,7 @@
 package com.vp.voicepocket.global.config;
 
-import com.vp.voicepocket.domain.token.config.CustomAccessDeniedHandler;
-import com.vp.voicepocket.domain.token.config.CustomAuthenticationEntryPoint;
+import com.vp.voicepocket.domain.token.config.JwtAuthenticationEntryPoint;
 import com.vp.voicepocket.domain.token.config.JwtAuthenticationFilter;
-import com.vp.voicepocket.domain.token.config.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,14 +10,13 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 @RequiredArgsConstructor
 @Configuration
 public class SecurityConfiguration {
-    private final JwtProvider jwtProvider;
-    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
-    private final CustomAccessDeniedHandler customAccessDeniedHandler;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -37,12 +34,11 @@ public class SecurityConfiguration {
 
                 .and()
                 .exceptionHandling()
-                .authenticationEntryPoint(customAuthenticationEntryPoint)
-                .accessDeniedHandler(customAccessDeniedHandler)
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
 
                 .and()
                 .addFilterBefore(
-                        new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class
+                        jwtAuthenticationFilter, BasicAuthenticationFilter.class
                 )
                 .build();
     }
