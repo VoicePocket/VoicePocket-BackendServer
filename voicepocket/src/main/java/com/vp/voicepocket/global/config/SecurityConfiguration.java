@@ -1,5 +1,6 @@
 package com.vp.voicepocket.global.config;
 
+import com.vp.voicepocket.domain.token.config.JwtAccessDeniedHandler;
 import com.vp.voicepocket.domain.token.config.JwtAuthenticationEntryPoint;
 import com.vp.voicepocket.domain.token.config.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 public class SecurityConfiguration {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -35,6 +37,7 @@ public class SecurityConfiguration {
                 .and()
                 .exceptionHandling()
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                .accessDeniedHandler(jwtAccessDeniedHandler)
 
                 .and()
                 .addFilterBefore(
