@@ -2,6 +2,7 @@ package com.vp.voicepocket.domain.token.config;
 
 import com.vp.voicepocket.domain.token.dto.TokenDto;
 import com.vp.voicepocket.domain.token.exception.CAuthenticationEntryPointException;
+import com.vp.voicepocket.domain.token.exception.CExpiredAccessTokenException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.impl.Base64UrlCodec;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,7 @@ public class JwtProvider {
     @Value("spring.jwt.secret")
     private String secretKey;
 
-    private String ROLES = "roles";
+    private final String ROLES = "roles";
     private final Long accessTokenValidMillisecond = 60 * 60 * 1000L; // 1 hour
     private final Long refreshTokenValidMillisecond = 14 * 24 * 60 * 60 * 1000L; // 14 day
     private final UserDetailsService userDetailsService;
@@ -136,9 +137,20 @@ public class JwtProvider {
         return false;
     }
 
-    public boolean checkValidationToken(String token){
-        Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
-        return true;
-    }
 
+    public Authentication validateAndGetAuthentication(String token) {
+        Claims claims = Jwts
+                .parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token)
+                .getBody();
+        if (claims.getExpiration().before(new Date())){
+            throw new CExpiredAccessTokenException();
+        }
+        if (claims.get(ROLES) == null) {
+            throw new CAuthenticationEntryPointException();
+        }
+        UserDetails userDetails = userDetailsService.loadUserByUsername(claims.getSubject());
+        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+    }
 }

@@ -6,6 +6,7 @@ import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.WriteResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -17,8 +18,10 @@ import java.util.Map;
 public class FirestoreService {
     private final Firestore firestore;
 
+    @Value("${firestore.path}")
+    String GCP_OPEN_URL;
+
     public void addWavUrl(String userEmail, String modelEmail, String wavUrl, String uuid){
-        String GCP_OPEN_URL = "https://storage.googleapis.com/voice_pocket_egg/";
         DocumentReference docRef = firestore
                 .collection("users")
                 .document(userEmail)
