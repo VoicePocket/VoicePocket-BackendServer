@@ -28,9 +28,13 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x voicepocket/gradlew
 
+      ## Move folder
+      - name: Move Folder
+        run: cd voicepocket
+
       ## Gradle Test를 실행한다
       - name: Test with Gradle
-        run: voicepocket/gradlew --info test
+        run: gradlew --info test
 
       ## Test 후 Report 생성
       - name: Publish Test Results
