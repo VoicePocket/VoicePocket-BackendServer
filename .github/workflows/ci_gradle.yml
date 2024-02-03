@@ -32,7 +32,7 @@ jobs:
       - name: Test with Gradle
         run: |
           cd voicepocket
-          ls- alh
+          ls -alh
           gradlew --info test
 
       ## Test 후 Report 생성
