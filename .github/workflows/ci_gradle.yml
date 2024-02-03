@@ -32,6 +32,10 @@ jobs:
       - name: Move Folder
         run: cd voicepocket
 
+      ## Show Folder Detail
+      - name: Show Folder Detail
+        run: ls -alh
+
       ## Gradle Test를 실행한다
       - name: Test with Gradle
         run: gradlew --info test
