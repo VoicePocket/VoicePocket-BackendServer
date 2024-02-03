@@ -13,7 +13,11 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="Friends")
+@Table(name="Friends", uniqueConstraints = {
+    @UniqueConstraint(
+        columnNames = {"request_from", "request_to"}
+    )
+})
 @Entity
 public class Friend extends BaseEntity {
     @Id
