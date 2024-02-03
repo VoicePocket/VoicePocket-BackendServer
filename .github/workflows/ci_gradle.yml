@@ -30,9 +30,10 @@ jobs:
 
       ## Gradle Test를 실행한다
       - name: Test with Gradle
-        run: cd voicepocket
-        ls- alh
-        gradlew --info test
+        run: |
+          cd voicepocket
+          ls- alh
+          gradlew --info test
 
       ## Test 후 Report 생성
       - name: Publish Test Results
