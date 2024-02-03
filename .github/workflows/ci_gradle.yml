@@ -33,7 +33,7 @@ jobs:
         run: |
           cd voicepocket
           ls -alh
-          gradlew --info test
+          ./gradlew --info test
 
       ## Test 후 Report 생성
       - name: Publish Test Results
