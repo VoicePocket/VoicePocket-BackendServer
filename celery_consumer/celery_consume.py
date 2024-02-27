@@ -36,9 +36,10 @@ def text_to_speech(uuid, email, text, sender_email):
     except Exception as e:
         message = {"requestFrom": sender_email, "requestTo":email,"result": e, "url":url_path, "uuid":uuid}
     
-    publish_message(message)
-        
-    return url_path
+    finally:
+        publish_message(message)
+
+        return url_path
 
 
 # publish message when TTS done
