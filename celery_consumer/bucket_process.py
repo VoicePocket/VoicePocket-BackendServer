@@ -1,39 +1,38 @@
 import os
+from google.cloud import storage
+
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="./voicepocket-bucketKey.json"
 
-from google.cloud import storage
-BUCKET_NAME = 'voice_pocket_egg'
-"""
-bucket_name: 서비스 계정 생성한 bucket 이름 입력
+BUCKET_NAME = 'bucket_vp'
 
-source_blob_name: GCP에 저장되어 있는 파일 명
-destination_file_name: 다운받을 파일을 저장할 경로 파일명까지("local/path/to/file")
+storage_client = storage.Client()
+bucket = storage_client.bucket(BUCKET_NAME)
 
-source_file_name = GCP에 업로드할 파일 절대경로
-destination_blob_name = 업로드할 파일을 GCP에 저장할 때의 이름
-"""
-
-
-def down_model_from_bucket(email):
-    storage_client = storage.Client()
-
-    bucket_name = BUCKET_NAME
-    source_blob_name = f'{email}_best_model.pth.tar'
-    destination_file_name = f'./voice_model/{source_blob_name}'
-
-    bucket = storage_client.bucket(bucket_name)
-    blob = bucket.blob(source_blob_name)
-
-    blob.download_to_filename(destination_file_name)
-
-def upload_wav_to_bucket(wav_path, email, uuid):
-    storage_client = storage.Client()
+# model이 bucket에 존재하는지 검사하는 메소드
+def check_model_exist(email):
+    model_name = f'{email}/{email}_best_model'
     
-    bucket_name = BUCKET_NAME
-    source_file_name = wav_path
+    return bucket.exists(model_name)
+
+# voice model를 bucket에서 다운로드하는 메소드
+def download_model_from_bucket(email):
+    source_blob_name = f'{email}/{email}_best_model'
+
+    blob = bucket.blob(source_blob_name)
+    model = blob.download_as_string()
+
+    return model
+
+# 만들어진 음성 model을 bucket에 업로드하는 메소드
+def upload_model_to_bucket(email, model):
+    destination_blob_name = f'{email}/{email}_best_model'
+
+    blob = bucket.blob(destination_blob_name)
+    blob.upload_from_string(model)
+
+# 생성한 음성 wav 파일을 bucket에 업로드하는 메소드
+def upload_wav_to_bucket(wav_path, email, uuid):
     destination_blob_name = f'{email}/{uuid}.wav'
     
-    bucket = storage_client.bucket(bucket_name)
     blob = bucket.blob(destination_blob_name)
-
-    blob.upload_from_filename(source_file_name)
+    blob.upload_from_filename(wav_path)
