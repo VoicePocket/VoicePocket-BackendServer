@@ -2,6 +2,7 @@ package com.vp.voicepocket.domain.user.dto.request;
 
 
 import com.vp.voicepocket.domain.user.entity.User;
+import com.vp.voicepocket.domain.user.entity.vo.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,9 +19,9 @@ public class UserRequestDto {
 
     public User toEntity() {
         return User.builder()
-                .email(email)
+                .email(Email.from(email))
                 .name(name)
-                .nickName(nickName)
+                .nickname(nickName)
                 .build();
     }
 }

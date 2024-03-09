@@ -2,14 +2,14 @@ package com.vp.voicepocket.domain.user.dto.request;
 
 
 import com.vp.voicepocket.domain.user.entity.User;
+import com.vp.voicepocket.domain.user.entity.enums.UserRole;
+import com.vp.voicepocket.domain.user.entity.vo.Email;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.Collections;
 
 @Getter
 @Builder
@@ -28,11 +28,11 @@ public class UserSignupRequestDto {
 
     public User toEntity(PasswordEncoder passwordEncoder) { // password를 encoding하여 엔티티 생성
         return User.builder()
-                .email(email)
+                .email(Email.from(email))
                 .password(passwordEncoder.encode(password))
-                .nickName(nickName)
+                .nickname(nickName)
                 .name(name)
-                .roles(Collections.singletonList("ROLE_USER"))
+                .role(UserRole.ROLE_USER)
                 .build();
     }
 }
