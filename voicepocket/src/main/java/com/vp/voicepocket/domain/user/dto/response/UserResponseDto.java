@@ -13,8 +13,8 @@ public class UserResponseDto {
     private final String email;
     private final String name;
     private final String nickName;
-    private String role;
-    private Collection<? extends GrantedAuthority> authorities;
+    private final String role;
+    private final Collection<? extends GrantedAuthority> authorities;
     private final LocalDateTime modifiedDate;
 
     public UserResponseDto(User user) {
