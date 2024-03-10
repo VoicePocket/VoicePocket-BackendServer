@@ -4,10 +4,10 @@ import com.vp.voicepocket.global.common.response.CommonCode;
 import com.vp.voicepocket.global.common.response.model.CommonResult;
 import com.vp.voicepocket.global.common.response.model.ListResult;
 import com.vp.voicepocket.global.common.response.model.SingleResult;
+import java.util.List;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
+@Deprecated(since = "2024-03-10", forRemoval = true)
 @Service
 public class ResponseService {
     // 단일 결과 처리 메소드
