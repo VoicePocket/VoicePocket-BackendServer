@@ -1,56 +1,51 @@
-package com.vp.voicepocket.global.common.response.service;
+package com.vp.voicepocket.global.common.response;
 
-import com.vp.voicepocket.global.common.response.CommonCode;
 import com.vp.voicepocket.global.common.response.model.CommonResult;
 import com.vp.voicepocket.global.common.response.model.ListResult;
 import com.vp.voicepocket.global.common.response.model.SingleResult;
 import java.util.List;
-import org.springframework.stereotype.Service;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
-@Deprecated(since = "2024-03-10", forRemoval = true)
-@Service
-public class ResponseService {
-    // 단일 결과 처리 메소드
-    public <T> SingleResult<T> getSingleResult(T data) {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class ResponseFactory {
+
+    public static <T> SingleResult<T> createSingleResult(T data) {
         SingleResult<T> result = new SingleResult<>();
         result.setData(data);
         setSuccessResult(result);
         return result;
     }
 
-    // 복수 결과 처리 메소드
-    public <T> ListResult<T> getListResult(List<T> list) {
+    public static <T> ListResult<T> createListResult(List<T> list) {
         ListResult<T> result = new ListResult<>();
         result.setData(list);
         setSuccessResult(result);
         return result;
     }
 
-    // 결과'만' 반환 (성공)
-    public CommonResult getSuccessResult() {
+    public static CommonResult createSuccessResult() {
         CommonResult result = new CommonResult();
         setSuccessResult(result);
         return result;
     }
 
-    // 결과'만' 반환 (실패)
-    public CommonResult getFailResult(int code, String message) {
+    public static CommonResult createFailResult(int code, String message) {
         CommonResult result = new CommonResult();
         setFailResult(result, code, message);
         return result;
     }
 
-    // API 요청 성공 시 공통 응답 모델을 성공 데이터로 세팅
-    private void setSuccessResult(CommonResult result) {
+    private static void setSuccessResult(CommonResult result) {
         result.setSuccess(true);
         result.setCode(CommonCode.SUCCESS.getCode());
         result.setMessage(CommonCode.SUCCESS.getMessage());
     }
 
-    // API 요청 성공 시 공통 응답 모델을 실패 데이터로 세팅
-    private void setFailResult(CommonResult result, int code, String message) {
+    private static void setFailResult(CommonResult result, int code, String message) {
         result.setSuccess(false);
         result.setCode(code);
         result.setMessage(message);
     }
+
 }
