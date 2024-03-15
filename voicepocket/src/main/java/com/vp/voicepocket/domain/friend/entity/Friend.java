@@ -2,12 +2,22 @@ package com.vp.voicepocket.domain.friend.entity;
 
 import com.vp.voicepocket.domain.user.entity.User;
 import com.vp.voicepocket.global.common.BaseEntity;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
 
 @Builder
 @Getter
@@ -25,11 +35,11 @@ public class Friend extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, targetEntity=User.class)
-    @JoinColumn(name="request_from", nullable = false, referencedColumnName = "userId")
+    @JoinColumn(name="request_from", nullable = false)
     private User request_from;
 
     @ManyToOne(fetch = FetchType.LAZY, targetEntity=User.class)
-    @JoinColumn(name="request_to", nullable = false, referencedColumnName = "userId")
+    @JoinColumn(name="request_to", nullable = false)
     private User request_to;
 
     @Column(name="status",nullable = false)
