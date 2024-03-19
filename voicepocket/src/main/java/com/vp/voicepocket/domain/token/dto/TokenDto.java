@@ -2,7 +2,11 @@ package com.vp.voicepocket.domain.token.dto;
 
 import com.vp.voicepocket.domain.token.entity.RefreshToken;
 import com.vp.voicepocket.domain.user.entity.User;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -17,7 +21,7 @@ public class TokenDto {
 
     public RefreshToken toEntity(User user){
         return RefreshToken.builder()
-                .key(user.getUserId())
+                .key(user.getId())
                 .token(refreshToken)
                 .build();
     }

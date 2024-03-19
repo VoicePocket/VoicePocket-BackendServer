@@ -13,14 +13,19 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 
 @Slf4j
 @Tag(name = "SignUp/LogIn")
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 @RestController
 public class SignController {
@@ -31,7 +36,7 @@ public class SignController {
     @PostMapping("/signup")
     public SingleResult<Long> signup(
             @Parameter(description = "회원 가입 요청 DTO", required = true)
-            @RequestBody UserSignupRequestDto userSignupRequestDto) {
+            @RequestBody @Valid UserSignupRequestDto userSignupRequestDto) {
         Long signupId = signService.signup(userSignupRequestDto);
         return responseService.getSingleResult(signupId);
     }
@@ -47,7 +52,7 @@ public class SignController {
     public SingleResult<TokenDto> login(
             @RequestHeader("FCM-TOKEN") String fcmToken,
             @Parameter(description = "로그인 요청 DTO", required = true)
-            @RequestBody UserLoginRequestDto userLoginRequestDto) {
+            @RequestBody @Valid UserLoginRequestDto userLoginRequestDto) {
 
         TokenDto tokenDto = signService.login(fcmToken, userLoginRequestDto);
         return responseService.getSingleResult(tokenDto);

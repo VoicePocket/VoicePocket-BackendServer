@@ -2,12 +2,10 @@ package com.vp.voicepocket.domain.user.dto.response;
 
 
 import com.vp.voicepocket.domain.user.entity.User;
-import lombok.Getter;
-import org.springframework.security.core.GrantedAuthority;
-
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.List;
+import lombok.Getter;
+import org.springframework.security.core.GrantedAuthority;
 
 @Getter
 public class UserResponseDto {
@@ -15,16 +13,16 @@ public class UserResponseDto {
     private final String email;
     private final String name;
     private final String nickName;
-    private List<String> roles;
-    private Collection<? extends GrantedAuthority> authorities;
+    private final String role;
+    private final Collection<? extends GrantedAuthority> authorities;
     private final LocalDateTime modifiedDate;
 
     public UserResponseDto(User user) {
-        this.userId = user.getUserId();
+        this.userId = user.getId();
         this.email = user.getEmail();
         this.name = user.getName();
-        this.nickName = user.getNickName();
-        this.roles = user.getRoles();
+        this.nickName = user.getNickname();
+        this.role = user.getRole().name();
         this.authorities = user.getAuthorities();
         this.modifiedDate = user.getModifiedDate();
     }

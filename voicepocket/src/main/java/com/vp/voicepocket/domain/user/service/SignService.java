@@ -16,6 +16,7 @@ import com.vp.voicepocket.domain.user.exception.CEmailLoginFailedException;
 import com.vp.voicepocket.domain.user.exception.CEmailSignUpFailedException;
 import com.vp.voicepocket.domain.user.exception.CUserNotFoundException;
 import com.vp.voicepocket.domain.user.repository.UserRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Service
 public class SignService {
+
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
@@ -37,16 +39,16 @@ public class SignService {
         if (userRepository.findByEmail(userSignupRequestDto.getEmail()).isPresent()) {
             throw new CEmailSignUpFailedException();
         }
-        return userRepository.save(userSignupRequestDto.toEntity(passwordEncoder)).getUserId();
+        return userRepository.save(userSignupRequestDto.toEntity(passwordEncoder)).getId();
     }
 
     @Transactional
     public TokenDto login(String fcmToken, UserLoginRequestDto userLoginRequestDto) {
         // 회원이 존재하는지 확인
         User user =
-                userRepository
-                        .findByEmail(userLoginRequestDto.getEmail())
-                        .orElseThrow(CEmailLoginFailedException::new);
+            userRepository
+                .findByEmail(userLoginRequestDto.getEmail())
+                .orElseThrow(CEmailLoginFailedException::new);
 
         // password 일치 여부 확인
         if (!passwordEncoder.matches(userLoginRequestDto.getPassword(), user.getPassword())) {
@@ -54,10 +56,11 @@ public class SignService {
         }
 
         // token 발급
-        TokenDto tokenDto = jwtProvider.createTokenDto(user.getUserId(), user.getRoles(), user.getEmail());
+        TokenDto tokenDto = jwtProvider.createTokenDto(user.getId(),
+            List.of(user.getRole().toString()), user.getEmail());
 
-        if (refreshTokenRepository.findByKey(user.getUserId()).isPresent()) {
-            RefreshToken refreshToken = refreshTokenRepository.findByKey(user.getUserId()).get();
+        if (refreshTokenRepository.findByKey(user.getId()).isPresent()) {
+            RefreshToken refreshToken = refreshTokenRepository.findByKey(user.getId()).get();
             refreshToken.updateToken(tokenDto.getRefreshToken());
         } else {
             refreshTokenRepository.save(tokenDto.toEntity(user));
@@ -66,7 +69,7 @@ public class SignService {
         // FCM TOKEN ADD or UPDATE
         if (fcmRepository.findByUserId(user).isEmpty()) {
             fcmRepository.save(FCMUserToken.builder().userId(user).FireBaseToken(fcmToken).build());
-        } else{
+        } else {
 
             fcmRepository.findByUserId(user).orElseThrow().update(fcmToken);
         }
@@ -84,15 +87,16 @@ public class SignService {
         // RefreshTokenRepository 에서 Username (pk) 가져오기
         String refreshToken = tokenRequestDto.getRefreshToken();
         RefreshToken refreshTokenEntity = refreshTokenRepository.findByToken(refreshToken)
-                .orElseThrow(CRefreshTokenException::new);
+            .orElseThrow(CRefreshTokenException::new);
 
         // user pk로 유저 검색 / repo 에 저장된 Refresh Token 가져오기
         User user =
-                userRepository
-                        .findById(refreshTokenEntity.getKey())
-                        .orElseThrow(CUserNotFoundException::new);
+            userRepository
+                .findById(refreshTokenEntity.getKey())
+                .orElseThrow(CUserNotFoundException::new);
 
         // AccessToken, RefreshToken 토큰 재발급, 리프레쉬 토큰 저장
-        return jwtProvider.updateAccessTokenDto(user.getUserId(), user.getRoles(), refreshToken);
+        return jwtProvider.updateAccessTokenDto(user.getId(), List.of(user.getRole().toString()),
+            refreshToken);
     }
 }

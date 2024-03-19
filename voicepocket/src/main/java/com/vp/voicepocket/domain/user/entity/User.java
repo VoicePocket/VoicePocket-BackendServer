@@ -1,8 +1,20 @@
 package com.vp.voicepocket.domain.user.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.vp.voicepocket.domain.user.entity.enums.UserRole;
+import com.vp.voicepocket.domain.user.entity.vo.Email;
 import com.vp.voicepocket.global.common.BaseEntity;
-import lombok.AllArgsConstructor;
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,23 +22,19 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
-@Builder
 @Getter
-@NoArgsConstructor @AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "Users")
 @Entity
 public class User extends BaseEntity implements UserDetails {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    @Column(name = "id", nullable = false, updatable = false)
+    private Long id;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)  // Json 결과로 출력하지 않을 값들은 애노테이션 선언으로 read하지 못하게 함
+    // Json 결과로 출력하지 않을 값들은 애노테이션 선언으로 read하지 못하게 함
     @Column(length = 100)
     private String password;
 
@@ -37,70 +45,100 @@ public class User extends BaseEntity implements UserDetails {
     private String name;
 
     @Column(nullable = false, length = 20)
-    private String nickName;
+    private String nickname;
 
-    @Column
-    private Boolean isActive;
+    @Enumerated(value = EnumType.STRING)
+    @Column(name = "role", nullable = false, updatable = false)
+    private UserRole role;
 
-    @ElementCollection(fetch = FetchType.EAGER) // User 객체의 권한이 담긴 컬렉션 객체를 User 조회시 EAGER로 즉시로딩하지 않는다면, Porxy객체가 담겨서 반환되므로 제대로 "ROLE_USER"를 확인할 수 없다.
-    @Builder.Default
-    private List<String> roles = new ArrayList<>(); // 권한은 회원당 여러개가 정의될 수 있으므로 컬렉션 타입으로 정의
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
-    @PrePersist
-    public void prePersist() {
-        this.isActive = this.isActive == null || this.isActive;
+    @Builder
+    private User(String password, Email email, String name, String nickname, UserRole role) {
+        this.password = validatePassword(password);
+        this.email = email.getValue();
+        this.name = validateName(name);
+        this.nickname = validateNickname(nickname);
+        this.role = validateRole(role);
     }
 
     public void updateNickName(String nickName) {
-        this.nickName = nickName;
+        this.nickname = nickName;
     }
 
     public void deleteUser() {
-        this.isActive = false;
+        this.deletedAt = LocalDateTime.now();
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(this.role.name()));
+    }
+
+    @Override
+    public String getUsername() {
+        return id.toString();
     }
 
     /**
-     * UserDetails Overriding
+     * @return 계정 만료 여부 -> 계정 만료 로직 존재 X -> true
      */
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
-    }
-
-    @Override
-    public String getPassword() {
-        return this.password;
-    }
-
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @Override
-    public String getUsername() {
-        return String.valueOf(this.userId);
-    }
-
-
-    // 아래는 스프링 시큐리티가 제공하는 회원 보안관련 메소드. 여기서는 사용하지 않으므로 기본 true로 세팅
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Override
     public boolean isAccountNonExpired() {
         return true;
-    }   // 계정이 만료되었는지 여부
+    }
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    /**
+     * @return 계정 잠김 여부 -> 계정 잠김 로직 존재 X -> true
+     */
     @Override
     public boolean isAccountNonLocked() {
         return true;
-    }   // 계정이 잠겼는지 여부
+    }
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    /**
+     * @return 패스워드 만료 여부 -> 패스워드 만료 로직 존재 X -> true
+     */
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
-    }   // 계정 패스워드가 만료되었는지 여부
+    }
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+
+    /**
+     * @return 계정 활성화 여부
+     */
     @Override
     public boolean isEnabled() {
-        return true;
-    }   // 계정이 사용하능한지 여부
+        return deletedAt == null;
+    }
+
+    private String validatePassword(String password) {
+        if (password == null || password.isBlank()) {
+            throw new IllegalArgumentException("비밀번호는 필수 입력값입니다.");
+        }
+        return password;
+    }
+
+    private String validateNickname(String nickname) {
+        if (nickname == null || nickname.isBlank()) {
+            throw new IllegalArgumentException("닉네임은 필수 입력값입니다.");
+        }
+        return nickname;
+    }
+
+    private String validateName(String name) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("이름은 필수 입력값입니다.");
+        }
+        return name;
+    }
+
+    private UserRole validateRole(UserRole role) {
+        if (role == null) {
+            throw new IllegalArgumentException("사용자 권한은 필수 입력값입니다.");
+        }
+        return role;
+    }
 }
