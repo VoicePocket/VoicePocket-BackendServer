@@ -36,18 +36,18 @@ public class FriendService {
     public FriendResponseDto requestFriend(FriendRequestDto friendRequestDto, String accessToken) {
         Authentication authentication = getAuthByAccessToken(accessToken);
 
-        User to_user = userRepository.findByEmail(friendRequestDto.getEmail())
+        User toUser = userRepository.findByEmail(friendRequestDto.getEmail())
             .orElseThrow(CUserNotFoundException::new);
 
-        User from_user = userRepository.findById(Long.parseLong(authentication.getName()))
+        User fromUser = userRepository.findById(Long.parseLong(authentication.getName()))
             .orElseThrow(CUserNotFoundException::new);
 
-        if (friendRepository.findByRequest(from_user, to_user, Status.ONGOING).isPresent() ||
-            friendRepository.findByRequest(from_user, to_user, Status.ACCEPT).isPresent()) {
+        if (friendRepository.findByRequest(fromUser, toUser, Status.ONGOING).isPresent() ||
+            friendRepository.findByRequest(fromUser, toUser, Status.ACCEPT).isPresent()) {
             throw new CFriendRequestOnGoingException();
         }
 
-        Friend friendRequest = friendRequestDto.toEntity(from_user, to_user, Status.ONGOING);
+        Friend friendRequest = friendRequestDto.toEntity(fromUser, toUser, Status.ONGOING);
 
         eventPublisher.publishEvent(new FriendRequestPushEvent(friendRequest));
 
@@ -77,10 +77,10 @@ public class FriendService {
     public List<FriendResponseDto> checkRequest(String accessToken) {
         Authentication authentication = getAuthByAccessToken(accessToken);
 
-        User to_user = userRepository.findById(Long.parseLong(authentication.getName()))
+        User toUser = userRepository.findById(Long.parseLong(authentication.getName()))
             .orElseThrow(CUserNotFoundException::new);
 
-        return friendRepository.findByToUser(to_user, Status.ONGOING)   // 없을 때 공백 리스트를 반환하기
+        return friendRepository.findByToUser(toUser, Status.ONGOING)   // 없을 때 공백 리스트를 반환하기
             .stream()
             .map(this::mapFriendEntityToFriendResponseDTO)
             .collect(Collectors.toList());
@@ -90,10 +90,10 @@ public class FriendService {
     public List<FriendResponseDto> checkResponse(String accessToken) {
         Authentication authentication = getAuthByAccessToken(accessToken);
 
-        User from_user = userRepository.findById(Long.parseLong(authentication.getName()))
+        User fromUser = userRepository.findById(Long.parseLong(authentication.getName()))
             .orElseThrow(CUserNotFoundException::new);
 
-        return friendRepository.findByFromUser(from_user, Status.ACCEPT)   // 없을 때 공백 리스트를 반환하기
+        return friendRepository.findByFromUser(fromUser, Status.ACCEPT)   // 없을 때 공백 리스트를 반환하기
             .stream()
             .map(this::mapFriendEntityToFriendResponseDTO)
             .collect(Collectors.toList());
@@ -104,12 +104,12 @@ public class FriendService {
     public void update(FriendRequestDto friendRequestDto, String accessToken, Status status) {
         Authentication authentication = getAuthByAccessToken(accessToken);
 
-        User from_user = userRepository.findByEmail(friendRequestDto.getEmail())
+        User fromUser = userRepository.findByEmail(friendRequestDto.getEmail())
             .orElseThrow(CUserNotFoundException::new);
-        User to_user = userRepository.findById(Long.parseLong(authentication.getName()))
+        User toUser = userRepository.findById(Long.parseLong(authentication.getName()))
             .orElseThrow(CUserNotFoundException::new);
 
-        Friend friendRequest = friendRepository.findByRequest(from_user, to_user, Status.ONGOING)
+        Friend friendRequest = friendRepository.findByRequest(fromUser, toUser, Status.ONGOING)
             .orElseThrow(CFriendRequestNotExistException::new);
         friendRequest.updateStatus(status);
 
@@ -122,12 +122,12 @@ public class FriendService {
     public void delete(FriendRequestDto friendRequestDto, String accessToken, Status status) {
         Authentication authentication = getAuthByAccessToken(accessToken);
 
-        User from_user = userRepository.findById(Long.parseLong(authentication.getName()))
+        User fromUser = userRepository.findById(Long.parseLong(authentication.getName()))
             .orElseThrow(CUserNotFoundException::new);
-        User to_user = userRepository.findByEmail(friendRequestDto.getEmail())
+        User toUser = userRepository.findByEmail(friendRequestDto.getEmail())
             .orElseThrow(CUserNotFoundException::new);
 
-        Friend friend = friendRepository.findByRequest(from_user, to_user, status)
+        Friend friend = friendRepository.findByRequest(fromUser, toUser, status)
             .orElseThrow(CFriendRequestNotExistException::new);
 
         friendRepository.delete(friend);
