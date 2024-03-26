@@ -12,6 +12,7 @@ import com.vp.voicepocket.domain.friend.repository.FriendRepository;
 import com.vp.voicepocket.domain.token.config.JwtProvider;
 import com.vp.voicepocket.domain.token.exception.CAccessTokenException;
 import com.vp.voicepocket.domain.user.entity.User;
+import com.vp.voicepocket.domain.user.entity.vo.Email;
 import com.vp.voicepocket.domain.user.exception.CUserNotFoundException;
 import com.vp.voicepocket.domain.user.repository.UserRepository;
 import java.util.List;
@@ -25,14 +26,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class FriendService {
+
     private final UserRepository userRepository;
     private final FriendRepository friendRepository;
     private final ApplicationEventPublisher eventPublisher;
 
+    // TODO: Will Remove
     private final JwtProvider jwtProvider;
 
     @Transactional
-    public FriendResponseDto requestFriend(FriendRequestDto friendRequestDto, String accessToken) {
+    public FriendResponseDto requestFriend(Email toUserEmail, String accessToken) {
         // TODO: Security Refactoring 이후 제거 - 24.03.26
         Authentication authentication = getAuthByAccessToken(accessToken);
         Long fromUserId = Long.parseLong(authentication.getName());
@@ -40,20 +43,19 @@ public class FriendService {
         User fromUser = userRepository.findById(fromUserId)
             .orElseThrow(CUserNotFoundException::new);
 
-        User toUser = userRepository.findByEmail(friendRequestDto.getEmail())
+        User toUser = userRepository.findByEmail(toUserEmail.getValue())
             .orElseThrow(CUserNotFoundException::new);
 
         friendRepository.findByRequestUsers(fromUserId, toUser).ifPresent(friend -> {
             throw new CFriendRequestOnGoingException();
         });
 
-        // 이거 DTO 로 받을 이유가?
-        Friend friendRequest = friendRequestDto.toEntity(fromUser, toUser, Status.ONGOING);
+        var friendRequest = friendRepository.save(
+            Friend.builder().requestFrom(fromUser).requestTo(toUser).build());
 
         eventPublisher.publishEvent(new FriendRequestPushEvent(friendRequest));
 
-        // TODO: 정적 스테틱 메서드로 리팩하기
-        return FriendResponseDto.from(friendRepository.save(friendRequest));
+        return FriendResponseDto.from(friendRequest);
     }
 
     private Authentication getAuthByAccessToken(String accessToken) {
@@ -97,7 +99,7 @@ public class FriendService {
     public void update(FriendRequestDto friendRequestDto, String accessToken, Status status) {
         Authentication authentication = getAuthByAccessToken(accessToken);
 
-        User fromUser = userRepository.findByEmail(friendRequestDto.getEmail())
+        User fromUser = userRepository.findByEmail(friendRequestDto.getEmail().getValue())
             .orElseThrow(CUserNotFoundException::new);
         User toUser = userRepository.findById(Long.parseLong(authentication.getName()))
             .orElseThrow(CUserNotFoundException::new);
@@ -117,7 +119,7 @@ public class FriendService {
 
         User fromUser = userRepository.findById(Long.parseLong(authentication.getName()))
             .orElseThrow(CUserNotFoundException::new);
-        User toUser = userRepository.findByEmail(friendRequestDto.getEmail())
+        User toUser = userRepository.findByEmail(friendRequestDto.getEmail().getValue())
             .orElseThrow(CUserNotFoundException::new);
 
         Friend friend = friendRepository.findByRequest(fromUser, toUser, status)
