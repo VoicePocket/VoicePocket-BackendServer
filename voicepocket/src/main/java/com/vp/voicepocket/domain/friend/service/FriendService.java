@@ -11,7 +11,6 @@ import com.vp.voicepocket.domain.friend.exception.CFriendRequestOnGoingException
 import com.vp.voicepocket.domain.friend.repository.FriendRepository;
 import com.vp.voicepocket.domain.token.config.JwtProvider;
 import com.vp.voicepocket.domain.token.exception.CAccessTokenException;
-import com.vp.voicepocket.domain.user.dto.response.UserResponseDto;
 import com.vp.voicepocket.domain.user.entity.User;
 import com.vp.voicepocket.domain.user.exception.CUserNotFoundException;
 import com.vp.voicepocket.domain.user.repository.UserRepository;
@@ -34,24 +33,27 @@ public class FriendService {
 
     @Transactional
     public FriendResponseDto requestFriend(FriendRequestDto friendRequestDto, String accessToken) {
+        // TODO: Security Refactoring 이후 제거 - 24.03.26
         Authentication authentication = getAuthByAccessToken(accessToken);
+        Long fromUserId = Long.parseLong(authentication.getName());
+
+        User fromUser = userRepository.findById(fromUserId)
+            .orElseThrow(CUserNotFoundException::new);
 
         User toUser = userRepository.findByEmail(friendRequestDto.getEmail())
             .orElseThrow(CUserNotFoundException::new);
 
-        User fromUser = userRepository.findById(Long.parseLong(authentication.getName()))
-            .orElseThrow(CUserNotFoundException::new);
-
-        if (friendRepository.findByRequest(fromUser, toUser, Status.ONGOING).isPresent() ||
-            friendRepository.findByRequest(fromUser, toUser, Status.ACCEPT).isPresent()) {
+        friendRepository.findByRequestUsers(fromUserId, toUser).ifPresent(friend -> {
             throw new CFriendRequestOnGoingException();
-        }
+        });
 
+        // 이거 DTO 로 받을 이유가?
         Friend friendRequest = friendRequestDto.toEntity(fromUser, toUser, Status.ONGOING);
 
         eventPublisher.publishEvent(new FriendRequestPushEvent(friendRequest));
 
-        return mapFriendEntityToFriendResponseDTO(friendRepository.save(friendRequest));
+        // TODO: 정적 스테틱 메서드로 리팩하기
+        return FriendResponseDto.from(friendRepository.save(friendRequest));
     }
 
     private Authentication getAuthByAccessToken(String accessToken) {
@@ -64,15 +66,6 @@ public class FriendService {
         return jwtProvider.getAuthentication(accessToken);
     }
 
-    private FriendResponseDto mapFriendEntityToFriendResponseDTO(Friend friend) {
-        return FriendResponseDto.builder()
-            .id(friend.getId())
-            .request_from(new UserResponseDto(friend.getRequestFrom()))
-            .request_to(new UserResponseDto(friend.getRequestTo()))
-            .status(friend.getStatus())
-            .build();
-    }
-
     @Transactional
     public List<FriendResponseDto> checkRequest(String accessToken) {
         Authentication authentication = getAuthByAccessToken(accessToken);
@@ -82,7 +75,7 @@ public class FriendService {
 
         return friendRepository.findByToUser(toUser, Status.ONGOING)   // 없을 때 공백 리스트를 반환하기
             .stream()
-            .map(this::mapFriendEntityToFriendResponseDTO)
+            .map(FriendResponseDto::from)
             .collect(Collectors.toList());
     }
 
@@ -95,7 +88,7 @@ public class FriendService {
 
         return friendRepository.findByFromUser(fromUser, Status.ACCEPT)   // 없을 때 공백 리스트를 반환하기
             .stream()
-            .map(this::mapFriendEntityToFriendResponseDTO)
+            .map(FriendResponseDto::from)
             .collect(Collectors.toList());
     }
 

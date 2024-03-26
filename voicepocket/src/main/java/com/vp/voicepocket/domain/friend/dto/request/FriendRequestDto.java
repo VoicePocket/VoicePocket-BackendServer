@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class FriendRequestDto {
     private String email;
 
-    public Friend toEntity(User request_from, User request_to, Status status) {
-        return Friend.builder().requestFrom(request_from).requestTo(request_to).status(status).build();
+    public Friend toEntity(User requestFrom, User requestTo, Status status) {
+        return Friend.builder().requestFrom(requestFrom).requestTo(requestTo).status(status).build();
     }
 }

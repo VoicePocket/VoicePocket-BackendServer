@@ -19,4 +19,7 @@ public interface FriendRepository extends JpaRepository<Friend, Long> {
 
     @Query(value = "select f from Friend f where f.requestFrom = :request_from and f.status = :status")
     List<Friend> findByFromUser(@Param("request_from") User request_from, @Param("status")Status status);
+
+    @Query("select f from Friend f where f.requestFrom.id = ?1 and f.requestTo = ?2 and (f.status = 'ONGOING' or f.status = 'ACCEPT')")
+    Optional<Friend> findByRequestUsers(Long requestFromId, User requestToId);
 }
