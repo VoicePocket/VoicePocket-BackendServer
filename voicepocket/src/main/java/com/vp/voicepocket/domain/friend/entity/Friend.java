@@ -43,7 +43,7 @@ public class Friend extends BaseEntity {
     private User requestTo;
 
     @Column(name="status",nullable = false)
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private Status status;
 
     public void updateStatus(Status status){
