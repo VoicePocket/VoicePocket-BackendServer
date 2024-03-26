@@ -15,14 +15,13 @@ import com.vp.voicepocket.domain.user.dto.response.UserResponseDto;
 import com.vp.voicepocket.domain.user.entity.User;
 import com.vp.voicepocket.domain.user.exception.CUserNotFoundException;
 import com.vp.voicepocket.domain.user.repository.UserRepository;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -68,8 +67,8 @@ public class FriendService {
     private FriendResponseDto mapFriendEntityToFriendResponseDTO(Friend friend) {
         return FriendResponseDto.builder()
             .id(friend.getId())
-            .request_from(new UserResponseDto(friend.getRequest_from()))
-            .request_to(new UserResponseDto(friend.getRequest_to()))
+            .request_from(new UserResponseDto(friend.getRequestFrom()))
+            .request_to(new UserResponseDto(friend.getRequestTo()))
             .status(friend.getStatus())
             .build();
     }

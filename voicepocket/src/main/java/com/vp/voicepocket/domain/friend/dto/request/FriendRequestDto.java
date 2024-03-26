@@ -15,6 +15,6 @@ public class FriendRequestDto {
     private String email;
 
     public Friend toEntity(User request_from, User request_to, Status status) {
-        return Friend.builder().request_from(request_from).request_to(request_to).status(status).build();
+        return Friend.builder().requestFrom(request_from).requestTo(request_to).status(status).build();
     }
 }

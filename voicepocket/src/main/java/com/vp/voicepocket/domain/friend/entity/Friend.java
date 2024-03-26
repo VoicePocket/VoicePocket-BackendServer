@@ -36,11 +36,11 @@ public class Friend extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, targetEntity=User.class)
     @JoinColumn(name="request_from", nullable = false)
-    private User request_from;
+    private User requestFrom;
 
     @ManyToOne(fetch = FetchType.LAZY, targetEntity=User.class)
     @JoinColumn(name="request_to", nullable = false)
-    private User request_to;
+    private User requestTo;
 
     @Column(name="status",nullable = false)
     @Enumerated(EnumType.ORDINAL)
