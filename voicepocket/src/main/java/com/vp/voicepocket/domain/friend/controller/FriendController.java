@@ -90,7 +90,7 @@ public class FriendController {
         @RequestHeader("X-AUTH-TOKEN") String accessToken,
         @Parameter(description = "친구 요청 DTO", required = true)
         @RequestBody FriendRequestDto friendRequestDto) {
-        friendService.delete(friendRequestDto, accessToken, Status.ONGOING);
+        friendService.delete(friendRequestDto, accessToken);
         return ResponseFactory.createSuccessResult();
     }
 
@@ -107,7 +107,7 @@ public class FriendController {
         @Parameter(description = "친구 요청 DTO", required = true)
         @RequestBody FriendRequestDto friendRequestDto,
         @PathVariable(name = "Status") Status status) {
-        friendService.update(friendRequestDto, accessToken, status);
+        friendService.update(friendRequestDto.getEmail(), accessToken, status);
         return ResponseFactory.createSuccessResult();
     }
 

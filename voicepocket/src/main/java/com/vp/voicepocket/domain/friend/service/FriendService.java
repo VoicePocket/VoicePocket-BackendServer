@@ -12,7 +12,6 @@ import com.vp.voicepocket.domain.friend.repository.FriendRepository;
 import com.vp.voicepocket.domain.token.config.JwtProvider;
 import com.vp.voicepocket.domain.token.exception.CAccessTokenException;
 import com.vp.voicepocket.domain.user.entity.User;
-import com.vp.voicepocket.domain.user.entity.vo.Email;
 import com.vp.voicepocket.domain.user.exception.CUserNotFoundException;
 import com.vp.voicepocket.domain.user.repository.UserRepository;
 import java.util.List;
@@ -24,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class FriendService {
 
@@ -34,8 +34,7 @@ public class FriendService {
     // TODO: Will Remove
     private final JwtProvider jwtProvider;
 
-    @Transactional
-    public FriendResponseDto requestFriend(Email toUserEmail, String accessToken) {
+    public FriendResponseDto requestFriend(String toUserEmail, String accessToken) {
         // TODO: Security Refactoring 이후 제거 - 24.03.26
         Authentication authentication = getAuthByAccessToken(accessToken);
         Long fromUserId = Long.parseLong(authentication.getName());
@@ -43,7 +42,7 @@ public class FriendService {
         User fromUser = userRepository.findById(fromUserId)
             .orElseThrow(CUserNotFoundException::new);
 
-        User toUser = userRepository.findByEmail(toUserEmail.getValue())
+        User toUser = userRepository.findByEmail(toUserEmail)
             .orElseThrow(CUserNotFoundException::new);
 
         friendRepository.findByRequestUsers(fromUserId, toUser).ifPresent(friend -> {
@@ -68,43 +67,37 @@ public class FriendService {
         return jwtProvider.getAuthentication(accessToken);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<FriendResponseDto> checkRequest(String accessToken) {
+        // 인증이 완료된 상태
         Authentication authentication = getAuthByAccessToken(accessToken);
+        Long userId = Long.parseLong(authentication.getName());
 
-        User toUser = userRepository.findById(Long.parseLong(authentication.getName()))
-            .orElseThrow(CUserNotFoundException::new);
-
-        return friendRepository.findByToUser(toUser, Status.ONGOING)   // 없을 때 공백 리스트를 반환하기
+        return friendRepository.findByToUser(userId)   // 없을 때 공백 리스트를 반환하기
             .stream()
             .map(FriendResponseDto::from)
             .collect(Collectors.toList());
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<FriendResponseDto> checkResponse(String accessToken) {
+
+        // 인증이 완료된 상태
         Authentication authentication = getAuthByAccessToken(accessToken);
+        Long userId = Long.parseLong(authentication.getName());
 
-        User fromUser = userRepository.findById(Long.parseLong(authentication.getName()))
-            .orElseThrow(CUserNotFoundException::new);
-
-        return friendRepository.findByFromUser(fromUser, Status.ACCEPT)   // 없을 때 공백 리스트를 반환하기
+        return friendRepository.findByFromUser(userId)   // 없을 때 공백 리스트를 반환하기
             .stream()
             .map(FriendResponseDto::from)
             .collect(Collectors.toList());
     }
 
 
-    @Transactional
-    public void update(FriendRequestDto friendRequestDto, String accessToken, Status status) {
+    public void update(String email, String accessToken, Status status) {
         Authentication authentication = getAuthByAccessToken(accessToken);
+        Long userId = Long.parseLong(authentication.getName());
 
-        User fromUser = userRepository.findByEmail(friendRequestDto.getEmail().getValue())
-            .orElseThrow(CUserNotFoundException::new);
-        User toUser = userRepository.findById(Long.parseLong(authentication.getName()))
-            .orElseThrow(CUserNotFoundException::new);
-
-        Friend friendRequest = friendRepository.findByRequest(fromUser, toUser, Status.ONGOING)
+        Friend friendRequest = friendRepository.findByRequest(email, userId)
             .orElseThrow(CFriendRequestNotExistException::new);
         friendRequest.updateStatus(status);
 
@@ -113,18 +106,13 @@ public class FriendService {
         }
     }
 
-    @Transactional
-    public void delete(FriendRequestDto friendRequestDto, String accessToken, Status status) {
+    public void delete(FriendRequestDto friendRequestDto, String accessToken) {
+        // User Validation Complete
         Authentication authentication = getAuthByAccessToken(accessToken);
-
-        User fromUser = userRepository.findById(Long.parseLong(authentication.getName()))
-            .orElseThrow(CUserNotFoundException::new);
-        User toUser = userRepository.findByEmail(friendRequestDto.getEmail().getValue())
-            .orElseThrow(CUserNotFoundException::new);
-
-        Friend friend = friendRepository.findByRequest(fromUser, toUser, status)
-            .orElseThrow(CFriendRequestNotExistException::new);
-
-        friendRepository.delete(friend);
+        Long userId = Long.parseLong(authentication.getName());
+        String opponentEmail = friendRequestDto.getEmail();
+        // Find Friend Request w userId + opponent email
+        friendRepository.findByUserIdAndEmail(userId, opponentEmail).ifPresentOrElse(
+            friendRepository::delete, CFriendRequestNotExistException::new);
     }
 }

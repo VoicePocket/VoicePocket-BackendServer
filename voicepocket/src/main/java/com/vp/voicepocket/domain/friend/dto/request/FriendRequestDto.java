@@ -11,7 +11,7 @@ public class FriendRequestDto {
     @javax.validation.constraints.Email
     private String email;
 
-    public Email getEmail(){
-        return Email.from(email);
+    public String getEmail(){
+        return Email.from(email).getValue();
     }
 }

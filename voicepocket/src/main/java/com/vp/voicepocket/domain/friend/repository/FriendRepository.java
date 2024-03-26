@@ -1,25 +1,26 @@
 package com.vp.voicepocket.domain.friend.repository;
 
 import com.vp.voicepocket.domain.friend.entity.Friend;
-import com.vp.voicepocket.domain.friend.entity.Status;
 import com.vp.voicepocket.domain.user.entity.User;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 @Repository
 public interface FriendRepository extends JpaRepository<Friend, Long> {
-    @Query(value = "select f from Friend f where f.requestFrom = :request_from and f.requestTo = :request_to and f.status =:status")
-    Optional<Friend> findByRequest(@Param("request_from") User request_from, @Param("request_to")User request_to, @Param("status")Status status);
+    @Query(value = "select f from Friend f where f.requestFrom.email = ?1 and f.requestTo.id = ?2 and f.status = 'ONGOING'")
+    Optional<Friend> findByRequest(String email, Long id);
 
-    @Query(value = "select f from Friend f where f.requestTo = :request_to and f.status = :status")
-    List<Friend> findByToUser(@Param("request_to") User request_to, @Param("status")Status status);
+    @Query(value = "select f from Friend f where f.requestFrom.id = ?1 and f.status = 'ACCEPT'")
+    List<Friend> findByFromUser(Long id);
 
-    @Query(value = "select f from Friend f where f.requestFrom = :request_from and f.status = :status")
-    List<Friend> findByFromUser(@Param("request_from") User request_from, @Param("status")Status status);
-
-    @Query("select f from Friend f where f.requestFrom.id = ?1 and f.requestTo = ?2 and (f.status = 'ONGOING' or f.status = 'ACCEPT')")
+    @Query("select f from Friend f where f.requestFrom.id = ?1 and f.requestTo = ?2 and f.status <> 'REJECT'")
     Optional<Friend> findByRequestUsers(Long requestFromId, User requestToId);
+
+    @Query("select f from Friend f where f.requestFrom.id = ?1 and f.requestTo.email = ?2 and f.status = 'ONGOING'")
+    Optional<Friend> findByUserIdAndEmail(Long id, String email);
+
+    @Query("select f from Friend f where f.requestTo.id = ?1 and f.status = 'ONGOING'")
+    Optional<Friend> findByToUser(Long id);
 }
