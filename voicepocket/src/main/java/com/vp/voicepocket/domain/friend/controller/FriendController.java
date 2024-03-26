@@ -4,10 +4,10 @@ import com.vp.voicepocket.domain.friend.dto.request.FriendRequestDto;
 import com.vp.voicepocket.domain.friend.dto.response.FriendResponseDto;
 import com.vp.voicepocket.domain.friend.entity.Status;
 import com.vp.voicepocket.domain.friend.service.FriendService;
+import com.vp.voicepocket.global.common.response.ResponseFactory;
 import com.vp.voicepocket.global.common.response.model.CommonResult;
 import com.vp.voicepocket.global.common.response.model.ListResult;
 import com.vp.voicepocket.global.common.response.model.SingleResult;
-import com.vp.voicepocket.global.common.response.service.ResponseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -15,7 +15,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @Tag(name = "Friend")
@@ -25,8 +33,6 @@ import org.springframework.web.bind.annotation.*;
 public class FriendController {
 
     private final FriendService friendService;
-
-    private final ResponseService responseService;
 
     @Parameter(
             name = "X-AUTH-TOKEN",
@@ -41,7 +47,7 @@ public class FriendController {
             @Parameter(description = "친구 요청 DTO", required = true)
             @RequestBody FriendRequestDto friendRequestDto) {
         FriendResponseDto friendResponseDto = friendService.requestFriend(friendRequestDto, accessToken);
-        return responseService.getSingleResult(friendResponseDto);
+        return ResponseFactory.createSingleResult(friendResponseDto);
     }
 
     @Parameter(
@@ -53,7 +59,7 @@ public class FriendController {
     @Operation(summary = "친구 요청 리스트 확인", description = "나에게 온 친구 요청을 확인합니다.")
     @GetMapping("/friend/requests")
     public ListResult<FriendResponseDto> checkRequest(@RequestHeader("X-AUTH-TOKEN") String accessToken) {
-        return responseService.getListResult(friendService.checkRequest(accessToken));
+        return ResponseFactory.createListResult(friendService.checkRequest(accessToken));
     }
 
     @Parameter(
@@ -65,7 +71,7 @@ public class FriendController {
     @Operation(summary = "친구 리스트 조회", description = "내 친구 리스트를 조회합니다.")
     @GetMapping("/friend")
     public ListResult<FriendResponseDto> checkResponse(@RequestHeader("X-AUTH-TOKEN") String accessToken) {
-        return responseService.getListResult(friendService.checkResponse(accessToken));
+        return ResponseFactory.createListResult(friendService.checkResponse(accessToken));
     }
 
     @Parameter(
@@ -81,7 +87,7 @@ public class FriendController {
             @Parameter(description = "친구 요청 DTO", required = true)
             @RequestBody FriendRequestDto friendRequestDto){
         friendService.delete(friendRequestDto, accessToken, Status.ONGOING);
-        return responseService.getSuccessResult();
+        return ResponseFactory.createSuccessResult();
     }
 
     @Parameter(
@@ -97,7 +103,7 @@ public class FriendController {
             @Parameter(description = "친구 요청 DTO", required = true)
             @RequestBody FriendRequestDto friendRequestDto, @PathVariable(name="Status") Status status) {
         friendService.update(friendRequestDto,accessToken, status);
-        return responseService.getSuccessResult();
+        return ResponseFactory.createSuccessResult();
     }
 
 }
